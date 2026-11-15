@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Aapka Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyAcZtid0O23fr5J1AySK6ptZfPveITMReU",
     authDomain: "bihar-har-pal-news-52a25.firebaseapp.com",
@@ -17,14 +16,36 @@ const db = getFirestore(app);
 let allPublishedNews = [];
 let currentOpenNews = null;
 
-// Top bar mein aaj ki live Hindi tarikh set karein
+// Live Hindi Date
 const liveDateEl = document.getElementById("live-date");
 if (liveDateEl) {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     liveDateEl.innerText = new Date().toLocaleDateString("hi-IN", options);
 }
 
-// Modal kholne ka function (Full news padhne ke liye)
+// Live Ads Load Function (Static Banner Image)
+async function loadLiveAds() {
+    try {
+        const adsSnap = await getDocs(collection(db, "ads"));
+        adsSnap.forEach((docSnap) => {
+            const ad = docSnap.data();
+            const slotEl = document.getElementById(ad.slotId);
+            if (slotEl && ad.imageUrl) {
+                slotEl.style.padding = "0";
+                slotEl.style.border = "1px solid #cbd5e1";
+                slotEl.style.background = "#fff";
+                slotEl.innerHTML = `
+                    <span class="ad-tag" style="background:rgba(0,0,0,0.6); color:#fff; padding:1px 5px; border-radius:2px;">विज्ञापन</span>
+                    <img src="${ad.imageUrl}" alt="${ad.title || 'Advertisement'}" style="width:100%; height:100%; max-height:420px; object-fit:contain; display:block;">
+                `;
+            }
+        });
+    } catch (err) {
+        console.error("Ads load error:", err);
+    }
+}
+
+// Full News Reader Modal
 function openNewsModal(news) {
     currentOpenNews = news;
     document.getElementById("modalCategory").innerText = news.category || "समाचार";
@@ -43,7 +64,6 @@ function openNewsModal(news) {
     document.getElementById("newsModal").style.display = "block";
 }
 
-// WhatsApp & Copy Link Share Buttons
 document.getElementById("whatsappShareBtn").addEventListener("click", () => {
     if (!currentOpenNews) return;
     const text = `📰 *${currentOpenNews.headline}*\n\nपूरी खबर पढ़ें Bihar Har Pal News पर:\n${window.location.href}`;
@@ -55,7 +75,6 @@ document.getElementById("copyLinkBtn").addEventListener("click", () => {
     alert("✅ वेबसाइट लिंक कॉपी हो गया है!");
 });
 
-// Modal band karne ke events
 document.getElementById("closeModal").addEventListener("click", () => {
     document.getElementById("newsModal").style.display = "none";
 });
@@ -65,7 +84,6 @@ window.addEventListener("click", (e) => {
     }
 });
 
-// Ek News Card HTML banane ka helper function
 function createNewsCard(news) {
     const card = document.createElement("article");
     card.className = "news-card";
@@ -87,7 +105,6 @@ function createNewsCard(news) {
     return card;
 }
 
-// Firestore se saari news load karein
 async function loadNews() {
     try {
         const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
@@ -103,14 +120,12 @@ async function loadNews() {
             return;
         }
 
-        // 1. Breaking News set karein
         const breakingList = allPublishedNews.filter(n => n.breakingNews);
         const breakingText = breakingList.length > 0
             ? breakingList.map(n => n.headline).join("   🔴   ")
             : allPublishedNews[0].headline;
         document.getElementById("breaking-news-text").innerText = breakingText;
 
-        // 2. Main Featured News set karein
         const featuredNews = allPublishedNews.find(n => n.featuredNews) || allPublishedNews[0];
         const featuredMain = document.getElementById("featured-main");
         const featImgHtml = featuredNews.imageUrl
@@ -128,7 +143,6 @@ async function loadNews() {
         `;
         featuredMain.onclick = () => openNewsModal(featuredNews);
 
-        // 3. Latest News Sidebar (Top 5 khabrein Thumbnail ke saath)
         const latestListEl = document.getElementById("latest-news-list");
         latestListEl.innerHTML = "";
         allPublishedNews.slice(0, 5).forEach(news => {
@@ -150,7 +164,6 @@ async function loadNews() {
             latestListEl.appendChild(item);
         });
 
-        // 4. Category Grids bharna
         renderMultiCategoryGrid(["बिहार"], "bihar-news-grid", 4);
         renderMultiCategoryGrid(["भारत", "राजनीति", "बिजनेस"], "india-news-grid", 4);
         renderMultiCategoryGrid(["दुनिया", "खेल", "मनोरंजन", "टेक्नोलॉजी"], "world-news-grid", 4);
@@ -177,13 +190,11 @@ function renderMultiCategoryGrid(categoriesArray, gridId, limitCount) {
     });
 }
 
-// Navbar & Sidebar Category Filter
 document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
     link.addEventListener("click", (e) => {
         e.preventDefault();
         const selectedCat = link.getAttribute("data-cat") || link.getAttribute("data-cat-link");
 
-        // Active class highlight karein
         document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
         const matchingNav = document.querySelector(`#category-nav a[data-cat="${selectedCat}"]`);
         if (matchingNav) matchingNav.classList.add("active");
@@ -210,7 +221,6 @@ document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
     });
 });
 
-// Live Search Filter
 const searchInput = document.getElementById("searchInput");
 if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -242,5 +252,5 @@ document.getElementById("reset-filter").addEventListener("click", (e) => {
     document.querySelector('#category-nav a[data-cat="ALL"]').classList.add("active");
 });
 
-// Page load hote hi news fetch karein
 loadNews();
+loadLiveAds();
