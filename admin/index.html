@@ -1,190 +1,206 @@
 <!DOCTYPE html>
 <html lang="hi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Bihar Har Pal News</title>
+    <title>Dashboard - Bihar Har Pal News Admin</title>
     <link rel="stylesheet" href="admin-style.css">
     <style>
-        .news-list-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background: #fff;
-        }
-        .news-list-table th, .news-list-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-        .news-list-table th {
-            background: #f8f9fa;
-            color: #333;
-            font-weight: bold;
-        }
-        .news-thumb {
-            width: 60px;
-            height: 42px;
-            object-fit: cover;
-            border-radius: 4px;
-            background: #eee;
-        }
-        .badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            background: #e9ecef;
-            color: #333;
-        }
-        .badge-breaking {
-            background: #ffe3e3;
-            color: #c40000;
-        }
-        .action-btns {
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f1f5f9; display: flex; min-height: 100vh; }
+
+        /* Left Dark Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #0f172a;
+            color: #fff;
             display: flex;
-            gap: 8px;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 14px;
+            flex-shrink: 0;
+        }
+        .sidebar-brand { text-align: center; padding-bottom: 18px; border-bottom: 1px solid #1e293b; }
+        .bhp-circle {
+            width: 64px; height: 64px; background: #c40000; color: #fff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 20px; margin: 0 auto 10px;
+        }
+        .sidebar-brand h2 { font-size: 18px; margin-bottom: 2px; }
+        .sidebar-brand p { font-size: 12px; color: #94a3b8; }
+
+        .nav-links { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; }
+        .nav-links a {
+            color: #cbd5e1; text-decoration: none; padding: 11px 14px;
+            border-radius: 6px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+            transition: 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { background: #c40000; color: #fff; }
+        .nav-links a.ads-highlight { background: rgba(217, 119, 6, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+        .nav-links a.ads-highlight:hover { background: #d97706; color: #fff; }
+
+        .view-site-btn {
+            display: block; text-align: center; background: #1e293b; color: #fff;
+            padding: 11px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600;
+            border: 1px solid #334155; margin-top: 20px;
+        }
+        .view-site-btn:hover { background: #334155; }
+
+        /* Main Area */
+        .main-content { flex: 1; padding: 24px 30px; overflow-y: auto; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 16px; border-bottom: 1px solid #cbd5e1; margin-bottom: 22px;
+        }
+        .topbar h1 { font-size: 26px; color: #0f172a; }
+        .topbar p { font-size: 13px; color: #64748b; }
+        .admin-actions { display: flex; align-items: center; gap: 12px; font-weight: 700; color: #0f172a; }
+        .logout-btn {
+            background: #c40000; color: #fff; border: none; padding: 8px 16px;
+            border-radius: 5px; font-weight: 700; cursor: pointer;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff; padding: 18px 20px; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        .stat-card span { font-size: 13px; color: #64748b; font-weight: 600; }
+        .stat-card h2 { font-size: 28px; color: #0f172a; margin-top: 4px; }
+
+        /* Welcome Box */
+        .welcome-box {
+            background: #fff; padding: 22px; border-radius: 10px;
+            border-left: 5px solid #c40000; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+        .welcome-box h3 { font-size: 20px; color: #0f172a; margin-bottom: 6px; }
+        .welcome-box p { font-size: 14px; color: #475569; margin-bottom: 14px; }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-primary-red {
+            background: #c40000; color: #fff; padding: 10px 18px; border-radius: 6px;
+            text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block;
+        }
+        .btn-amber {
+            background: #d97706; color: #fff; padding: 10px 18px; border-radius: 6px;
+            text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block;
+        }
+
+        /* Published News Table/List */
+        .news-list-box {
+            background: #fff; padding: 22px; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        .list-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+        }
+        .news-item-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 14px;
+            padding: 14px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;
             flex-wrap: wrap;
         }
-        .edit-btn {
-            background: #0d6efd;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
+        .badge-cat {
+            background: #fee2e2; color: #c40000; padding: 3px 9px; border-radius: 4px;
+            font-size: 12px; font-weight: 700;
         }
-        .edit-btn:hover {
-            background: #0b5ed7;
+        .action-btns { display: flex; gap: 8px; }
+        .btn-edit {
+            background: #2563eb; color: #fff; padding: 6px 13px; border-radius: 5px;
+            text-decoration: none; font-size: 13px; font-weight: 700;
         }
-        .delete-btn {
-            background: #c40000;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
+        .btn-delete {
+            background: #dc2626; color: #fff; border: none; padding: 6px 13px;
+            border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer;
         }
-        .delete-btn:hover {
-            background: #9e0000;
-        }
-        .table-wrapper {
-            overflow-x: auto;
+
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
-
 <body>
 
-    <!-- Sidebar -->
+    <!-- Left Sidebar -->
     <aside class="sidebar">
-        <div class="admin-logo">
-            <div class="admin-logo-circle">BHP</div>
-            <h2>Bihar Har Pal</h2>
-            <p>News Admin</p>
+        <div>
+            <div class="sidebar-brand">
+                <div class="bhp-circle">BHP</div>
+                <h2>Bihar Har Pal</h2>
+                <p>News Admin</p>
+            </div>
+
+            <nav class="nav-links">
+                <a href="index.html" class="active">📊 Dashboard</a>
+                <a href="add-news.html">📝 Add News</a>
+                <a href="manage-ads.html" class="ads-highlight">📢 Manage Ads</a>
+                <a href="#all-news-section">📰 All News</a>
+                <a href="../index.html" target="_blank">📂 Categories</a>
+            </nav>
         </div>
 
-        <nav class="admin-menu">
-            <a href="index.html" class="active">📊 Dashboard</a>
-            <a href="add-news.html">📝 Add News</a>
-            <a href="#recent-news-section">📰 All News</a>
-            <a href="#">📂 Categories</a>
-            <a href="#">🖼️ Media</a>
-            <a href="#">⚙️ Settings</a>
-        </nav>
-
-        <div class="logout">
-            <a href="../index.html">🌐 View Website</a>
-        </div>
+        <a href="../index.html" target="_blank" class="view-site-btn">🌐 View Website</a>
     </aside>
 
-    <!-- Main Area -->
-    <main class="main">
-
-        <!-- Top Header -->
-        <header class="top-header">
+    <!-- Main Dashboard Area -->
+    <main class="main-content">
+        <div class="topbar">
             <div>
                 <h1>Dashboard</h1>
                 <p>Bihar Har Pal News Admin Panel</p>
             </div>
-            <div class="admin-user">👤 Administrator</div>
-        </header>
-
-        <!-- Dashboard Cards -->
-        <section class="dashboard-cards">
-            <div class="dashboard-card">
-                <div class="card-icon">📰</div>
-                <div>
-                    <p>Total News</p>
-                    <h2 id="totalCount">0</h2>
-                </div>
+            <div class="admin-actions">
+                <span>👤 Admin |</span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
+        </div>
 
-            <div class="dashboard-card">
-                <div class="card-icon">🟢</div>
-                <div>
-                    <p>Published</p>
-                    <h2 id="publishedCount">0</h2>
-                </div>
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>📰 Total News</span>
+                <h2 id="totalCount">0</h2>
             </div>
-
-            <div class="dashboard-card">
-                <div class="card-icon">⭐</div>
-                <div>
-                    <p>Featured News</p>
-                    <h2 id="featuredCount">0</h2>
-                </div>
+            <div class="stat-card">
+                <span>🟢 Published</span>
+                <h2 id="publishedCount">0</h2>
             </div>
-
-            <div class="dashboard-card">
-                <div class="card-icon">🔴</div>
-                <div>
-                    <p>Breaking News</p>
-                    <h2 id="breakingCount">0</h2>
-                </div>
+            <div class="stat-card">
+                <span>⭐ Featured News</span>
+                <h2 id="featuredCount">0</h2>
             </div>
-        </section>
+            <div class="stat-card">
+                <span>🔴 Breaking News</span>
+                <h2 id="breakingCount">0</h2>
+            </div>
+        </div>
 
         <!-- Welcome Box -->
-        <section class="welcome">
-            <h2>नमस्कार! 👋</h2>
-            <p>
-                Bihar Har Pal News के Admin Panel में आपका स्वागत है।
-                यहां से आप अपनी News को manage, edit और publish कर पाएंगे।
-            </p>
-            <button onclick="window.location.href='add-news.html'">
-                + Add New News
-            </button>
-        </section>
-
-        <!-- Recent News -->
-        <section class="recent" id="recent-news-section">
-            <div class="section-header">
-                <h2>All Published News</h2>
-                <button onclick="window.location.href='add-news.html'">
-                    + नई खबर लिखें
-                </button>
+        <div class="welcome-box">
+            <h3>नमस्कार! 👋</h3>
+            <p>Bihar Har Pal News के Admin Panel में आपका स्वागत है। यहाँ से आप अपनी News और वेबसाइट के विज्ञापन (Ads) को manage, edit और publish कर पाएंगे।</p>
+            <div class="btn-group">
+                <a href="add-news.html" class="btn-primary-red">+ Add New News</a>
+                <a href="manage-ads.html" class="btn-amber">📢 Manage Ads (विज्ञापन लगाएं)</a>
             </div>
+        </div>
 
-            <div id="newsContainer" class="table-wrapper">
-                <div class="empty-news">
-                    <div class="empty-icon">⏳</div>
-                    <h3>खबरें लोड हो रही हैं...</h3>
-                </div>
+        <!-- All Published News -->
+        <div class="news-list-box" id="all-news-section">
+            <div class="list-header">
+                <h3>All Published News</h3>
+                <a href="add-news.html" style="border:1px solid #cbd5e1; padding:6px 12px; border-radius:5px; text-decoration:none; color:#0f172a; font-size:13px; font-weight:700;">+ नई खबर लिखें</a>
             </div>
-        </section>
-
+            <div id="adminNewsList">
+                <p style="color:#64748b;">खबरें लोड हो रही हैं...</p>
+            </div>
+        </div>
     </main>
 
-    <!-- Firebase Auth & Firestore Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -203,127 +219,68 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Login Check
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = "login.html";
             } else {
-                loadDashboardNews();
+                fetchAllNews();
             }
         });
 
-        // Logout Button
-        const adminUserEl = document.querySelector(".admin-user");
-        if (adminUserEl) {
-            adminUserEl.innerHTML = `👤 Admin | <button id="logoutBtn" style="background:#c40000;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-left:8px;">Logout</button>`;
-            document.getElementById("logoutBtn").addEventListener("click", async () => {
-                await signOut(auth);
-                window.location.href = "login.html";
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            await signOut(auth);
+            window.location.href = "login.html";
+        });
+
+        async function fetchAllNews() {
+            const listEl = document.getElementById("adminNewsList");
+            const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+
+            let total = 0, featured = 0, breaking = 0;
+            listEl.innerHTML = "";
+
+            if (snap.empty) {
+                listEl.innerHTML = "<p style='color:#64748b;'>अभी कोई खबर प्रकाशित नहीं है।</p>";
+                return;
+            }
+
+            snap.forEach((docSnap) => {
+                const news = docSnap.data();
+                total++;
+                if (news.featuredNews) featured++;
+                if (news.breakingNews) breaking++;
+
+                const row = document.createElement("div");
+                row.className = "news-item-row";
+                row.innerHTML = `
+                    <div style="flex:1; min-width:240px;">
+                        <span class="badge-cat">${news.category || "समाचार"}</span>
+                        <span style="color:#64748b; font-size:12px; margin-left:8px;">📍 ${news.location || "बिहार"} | 📅 ${news.date || ""}</span>
+                        <h4 style="margin-top:6px; font-size:16px; color:#0f172a;">${news.headline}</h4>
+                    </div>
+                    <div class="action-btns">
+                        <a href="add-news.html?edit=${docSnap.id}" class="btn-edit">✏️ Edit</a>
+                        <button class="btn-delete" data-id="${docSnap.id}">🗑️ Delete</button>
+                    </div>
+                `;
+                listEl.appendChild(row);
+            });
+
+            document.getElementById("totalCount").innerText = total;
+            document.getElementById("publishedCount").innerText = total;
+            document.getElementById("featuredCount").innerText = featured;
+            document.getElementById("breakingCount").innerText = breaking;
+
+            document.querySelectorAll(".btn-delete").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    if (confirm("क्या आप वाकई इस खबर को डिलीट करना चाहते हैं?")) {
+                        await deleteDoc(doc(db, "news", btn.getAttribute("data-id")));
+                        fetchAllNews();
+                    }
+                });
             });
         }
-
-        async function loadDashboardNews() {
-            const container = document.getElementById("newsContainer");
-            try {
-                const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
-                const snapshot = await getDocs(q);
-
-                const newsList = [];
-                snapshot.forEach((docSnap) => {
-                    newsList.push({ id: docSnap.id, ...docSnap.data() });
-                });
-
-                // Stats update karein
-                document.getElementById("totalCount").innerText = newsList.length;
-                document.getElementById("publishedCount").innerText = newsList.length;
-                document.getElementById("featuredCount").innerText = newsList.filter(n => n.featuredNews).length;
-                document.getElementById("breakingCount").innerText = newsList.filter(n => n.breakingNews).length;
-
-                if (newsList.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-news">
-                            <div class="empty-icon">📰</div>
-                            <h3>अभी कोई News नहीं है</h3>
-                            <p>अपनी पहली news publish करने के लिए "Add News" पर क्लिक करें।</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Table banayein
-                let tableHTML = `
-                    <table class="news-list-table">
-                        <thead>
-                            <tr>
-                                <th>Photo</th>
-                                <th>Headline</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                newsList.forEach(news => {
-                    const imgTag = news.imageUrl
-                        ? `<img src="${news.imageUrl}" class="news-thumb" alt="thumb">`
-                        : `<div class="news-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:#777;">No Img</div>`;
-
-                    const statusBadges = `
-                        ${news.breakingNews ? '<span class="badge badge-breaking">🔴 Breaking</span>' : ''}
-                        ${news.featuredNews ? '<span class="badge">⭐ Featured</span>' : ''}
-                        ${!news.breakingNews && !news.featuredNews ? '<span class="badge">Normal</span>' : ''}
-                    `;
-
-                    tableHTML += `
-                        <tr>
-                            <td>${imgTag}</td>
-                            <td><strong>${news.headline}</strong><br><small style="color:#666;">📍 ${news.location || "बिहार"}</small></td>
-                            <td><span class="badge">${news.category}</span></td>
-                            <td>${statusBadges}</td>
-                            <td>${news.date || ""}</td>
-                            <td>
-                                <div class="action-btns">
-                                    <a href="add-news.html?edit=${news.id}" class="edit-btn">✏️ Edit</a>
-                                    <button class="delete-btn" data-id="${news.id}">🗑️ Delete</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                tableHTML += `</tbody></table>`;
-                container.innerHTML = tableHTML;
-
-                // Delete button event listeners
-                document.querySelectorAll(".delete-btn").forEach(btn => {
-                    btn.addEventListener("click", async function () {
-                        const newsId = this.getAttribute("data-id");
-                        const confirmDelete = confirm("क्या आप वाकई इस खबर को हमेशा के लिए Delete करना चाहते हैं?");
-                        if (!confirmDelete) return;
-
-                        this.disabled = true;
-                        this.innerText = "Deleting...";
-                        try {
-                            await deleteDoc(doc(db, "news", newsId));
-                            alert("खबर Delete हो गई!");
-                            loadDashboardNews();
-                        } catch (err) {
-                            alert("Delete करने में समस्या आई: " + err.message);
-                            this.disabled = false;
-                            this.innerText = "🗑️ Delete";
-                        }
-                    });
-                });
-
-            } catch (error) {
-                console.error("Dashboard load error:", error);
-                container.innerHTML = `<p style="color:red; padding:15px;">डेटा लोड करने में त्रुटि: ${error.message}</p>`;
-            }
-        }
     </script>
-
 </body>
 </html>
