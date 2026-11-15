@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Ads - Bihar Har Pal News Admin</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <style>
+        .ad-manager-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .card-box {
+            background: #fff;
+            padding: 22px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #0f172a;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn-save-ad {
+            background: #c40000;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-save-ad:hover {
+            background: #990000;
+        }
+        .ad-preview-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 14px;
+            background: #f8fafc;
+        }
+        .ad-preview-card img {
+            width: 100%;
+            max-height: 140px;
+            object-fit: contain;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+        .slot-badge {
+            display: inline-block;
+            background: #0f172a;
+            color: #fbbf24;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .btn-del-ad {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        @media (max-width: 850px) {
+            .ad-manager-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header style="background:#0f172a; color:#fff; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:3px solid #c40000;">
+        <h2 style="margin:0; font-size:20px;">📢 विज्ञापन प्रबंधन (Manage Ads)</h2>
+        <div style="display:flex; gap:10px;">
+            <a href="index.html" style="background:#334155; color:#fff; padding:8px 14px; border-radius:5px; text-decoration:none; font-size:14px; font-weight:600;">← डैशबोर्ड</a>
+            <a href="../index.html" target="_blank" style="background:#16a34a; color:#fff; padding:8px 14px; border-radius:5px; text-decoration:none; font-size:14px; font-weight:600;">🌐 लाइव साइट देखें</a>
+        </div>
+    </header>
+
+    <div style="max-width:1150px; margin:25px auto; padding:0 15px;">
+        <div class="ad-manager-grid">
+
+            <!-- Left: Add / Update Ad Form -->
+            <div class="card-box">
+                <h3 style="margin-bottom:15px; color:#0f172a; border-bottom:2px solid #c40000; padding-bottom:8px;">➕ नया विज्ञापन लगाएं / बदलें</h3>
+                
+                <form id="adForm">
+                    <div class="form-group">
+                        <label>1. विज्ञापन की जगह (Ad Slot चुनें) *</label>
+                        <select id="adSlot" required>
+                            <option value="ad-slot-header">1. Top Header Banner (Logo के बगल में - 728×90)</option>
+                            <option value="ad-slot-mid">2. Mid-Page Wide Banner (Hero के नीचे - 970×90)</option>
+                            <option value="ad-slot-sidebar-1">3. Right Sidebar Square (300×250)</option>
+                            <option value="ad-slot-sidebar-2">4. Right Sidebar Tall Banner (300×400)</option>
+                            <option value="ad-slot-article">5. In-Article Reader Banner (खबर पढ़ते समय)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. विज्ञापनदाता / ब्रांड का नाम *</label>
+                        <input type="text" id="adTitle" placeholder="उदा: न्यू बिहार ज्वेलर्स, साहेबगंज" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3. बैनर फोटो चुनें (Upload Banner Image)</label>
+                        <input type="file" id="adFile" accept="image/*">
+                        <small style="color:#64748b; display:block; margin-top:4px;">या नीचे सीधा Image URL पेस्ट करें:</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4. Image URL (यदि फोटो अपलोड न करें)</label>
+                        <input type="url" id="adImageUrl" placeholder="https://res.cloudinary.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>5. क्लिक करने पर खुलने वाला लिंक (WhatsApp / Website Link)</label>
+                        <input type="url" id="adLink" placeholder="https://wa.me/9198XXXXXXXX या वेबसाइट लिंक">
+                    </div>
+
+                    <button type="submit" id="saveAdBtn" class="btn-save-ad">🚀 विज्ञापन लाइव करें</button>
+                </form>
+            </div>
+
+            <!-- Right: Active Ads List -->
+            <div class="card-box">
+                <h3 style="margin-bottom:15px; color:#0f172a; border-bottom:2px solid #0f172a; padding-bottom:8px;">📺 वर्तमान में चल रहे विज्ञापन (Active Ads)</h3>
+                <div id="activeAdsList">
+                    <p style="color:#64748b;">विज्ञापन लोड हो रहे हैं...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDocs, deleteDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcZtid0O23fr5J1AySK6ptZfPveITMReU",
+            authDomain: "bihar-har-pal-news-52a25.firebaseapp.com",
+            projectId: "bihar-har-pal-news-52a25",
+            storageBucket: "bihar-har-pal-news-52a25.firebasestorage.app",
+            messagingSenderId: "25215359679",
+            appId: "1:25215359679:web:3c069cb8d7cdaa2e32040a"
+        };
+
+        // अपनी Cloudinary डिटेल्स यहाँ डालें (यदि डायरेक्ट फोटो अपलोड करना हो)
+        const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME"; 
+        const CLOUDINARY_UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            } else {
+                loadActiveAds();
+            }
+        });
+
+        const slotNames = {
+            "ad-slot-header": "1. Top Header Banner (728×90)",
+            "ad-slot-mid": "2. Mid-Page Wide Banner (970×90)",
+            "ad-slot-sidebar-1": "3. Right Sidebar Square (300×250)",
+            "ad-slot-sidebar-2": "4. Right Sidebar Tall (300×400)",
+            "ad-slot-article": "5. In-Article Reader Banner"
+        };
+
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if (!data.secure_url) throw new Error("Cloudinary upload failed");
+            return data.secure_url;
+        }
+
+        document.getElementById("adForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("saveAdBtn");
+            btn.disabled = true;
+            btn.innerText = "⏳ सेव हो रहा है...";
+
+            try {
+                const slotId = document.getElementById("adSlot").value;
+                const title = document.getElementById("adTitle").value.trim();
+                const link = document.getElementById("adLink").value.trim();
+                const fileInput = document.getElementById("adFile");
+                let imageUrl = document.getElementById("adImageUrl").value.trim();
+
+                if (fileInput.files.length > 0) {
+                    if (CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME") {
+                        alert("⚠️ कृपया manage-ads.html में अपना Cloudinary Cloud Name डालें या नीचे Image URL पेस्ट करें।");
+                        btn.disabled = false;
+                        btn.innerText = "🚀 विज्ञापन लाइव करें";
+                        return;
+                    }
+                    imageUrl = await uploadToCloudinary(fileInput.files[0]);
+                }
+
+                if (!imageUrl) {
+                    alert("⚠️ कृपया विज्ञापन बैनर की फोटो चुनें या Image URL डालें!");
+                    btn.disabled = false;
+                    btn.innerText = "🚀 विज्ञापन लाइव करें";
+                    return;
+                }
+
+                await setDoc(doc(db, "ads", slotId), {
+                    slotId,
+                    title,
+                    imageUrl,
+                    link: link || "#footer-contact",
+                    updatedAt: new Date().toLocaleDateString("hi-IN")
+                });
+
+                alert("✅ विज्ञापन सफलतापूर्वक लाइव हो गया है!");
+                document.getElementById("adForm").reset();
+                loadActiveAds();
+            } catch (err) {
+                console.error(err);
+                alert("❌ विज्ञापन सेव करने में त्रुटि: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "🚀 विज्ञापन लाइव करें";
+            }
+        });
+
+        async function loadActiveAds() {
+            const listEl = document.getElementById("activeAdsList");
+            listEl.innerHTML = "<p style='color:#64748b;'>लोड हो रहा है...</p>";
+            const snap = await getDocs(collection(db, "ads"));
+
+            if (snap.empty) {
+                listEl.innerHTML = "<p style='color:#64748b; padding:12px; background:#f8fafc; border-radius:6px;'>अभी कोई कस्टम विज्ञापन नहीं लगा है। बाईं ओर से नया विज्ञापन जोड़ें।</p>";
+                return;
+            }
+
+            listEl.innerHTML = "";
+            snap.forEach((docSnap) => {
+                const ad = docSnap.data();
+                const div = document.createElement("div");
+                div.className = "ad-preview-card";
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="slot-badge">${slotNames[ad.slotId] || ad.slotId}</span>
+                        <button class="btn-del-ad" data-id="${ad.slotId}">🗑️ हटाएं</button>
+                    </div>
+                    <h4 style="margin-top:8px; color:#0f172a;">${ad.title}</h4>
+                    <img src="${ad.imageUrl}" alt="${ad.title}">
+                    <small style="color:#64748b;">🔗 लिंक: ${ad.link}</small>
+                `;
+                listEl.appendChild(div);
+            });
+
+            document.querySelectorAll(".btn-del-ad").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    if (confirm("क्या आप इस विज्ञापन को हटाना चाहते हैं?")) {
+                        await deleteDoc(doc(db, "ads", btn.getAttribute("data-id")));
+                        loadActiveAds();
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
