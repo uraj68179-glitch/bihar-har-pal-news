@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Bihar Har Pal News</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <style>
+        .news-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+        }
+        .news-list-table th, .news-list-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .news-list-table th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+        }
+        .news-thumb {
+            width: 60px;
+            height: 42px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #eee;
+        }
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #333;
+        }
+        .badge-breaking {
+            background: #ffe3e3;
+            color: #c40000;
+        }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .edit-btn {
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .edit-btn:hover {
+            background: #0b5ed7;
+        }
+        .delete-btn {
+            background: #c40000;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .delete-btn:hover {
+            background: #9e0000;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="admin-logo">
+            <div class="admin-logo-circle">BHP</div>
+            <h2>Bihar Har Pal</h2>
+            <p>News Admin</p>
+        </div>
+
+        <nav class="admin-menu">
+            <a href="index.html" class="active">📊 Dashboard</a>
+            <a href="add-news.html">📝 Add News</a>
+            <a href="#recent-news-section">📰 All News</a>
+            <a href="#">📂 Categories</a>
+            <a href="#">🖼️ Media</a>
+            <a href="#">⚙️ Settings</a>
+        </nav>
+
+        <div class="logout">
+            <a href="../index.html">🌐 View Website</a>
+        </div>
+    </aside>
+
+    <!-- Main Area -->
+    <main class="main">
+
+        <!-- Top Header -->
+        <header class="top-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Bihar Har Pal News Admin Panel</p>
+            </div>
+            <div class="admin-user">👤 Administrator</div>
+        </header>
+
+        <!-- Dashboard Cards -->
+        <section class="dashboard-cards">
+            <div class="dashboard-card">
+                <div class="card-icon">📰</div>
+                <div>
+                    <p>Total News</p>
+                    <h2 id="totalCount">0</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🟢</div>
+                <div>
+                    <p>Published</p>
+                    <h2 id="publishedCount">0</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">⭐</div>
+                <div>
+                    <p>Featured News</p>
+                    <h2 id="featuredCount">0</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🔴</div>
+                <div>
+                    <p>Breaking News</p>
+                    <h2 id="breakingCount">0</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Welcome Box -->
+        <section class="welcome">
+            <h2>नमस्कार! 👋</h2>
+            <p>
+                Bihar Har Pal News के Admin Panel में आपका स्वागत है।
+                यहां से आप अपनी News को manage, edit और publish कर पाएंगे।
+            </p>
+            <button onclick="window.location.href='add-news.html'">
+                + Add New News
+            </button>
+        </section>
+
+        <!-- Recent News -->
+        <section class="recent" id="recent-news-section">
+            <div class="section-header">
+                <h2>All Published News</h2>
+                <button onclick="window.location.href='add-news.html'">
+                    + नई खबर लिखें
+                </button>
+            </div>
+
+            <div id="newsContainer" class="table-wrapper">
+                <div class="empty-news">
+                    <div class="empty-icon">⏳</div>
+                    <h3>खबरें लोड हो रही हैं...</h3>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Firebase Auth & Firestore Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcZtid0O23fr5J1AySK6ptZfPveITMReU",
+            authDomain: "bihar-har-pal-news-52a25.firebaseapp.com",
+            projectId: "bihar-har-pal-news-52a25",
+            storageBucket: "bihar-har-pal-news-52a25.firebasestorage.app",
+            messagingSenderId: "25215359679",
+            appId: "1:25215359679:web:3c069cb8d7cdaa2e32040a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Login Check
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            } else {
+                loadDashboardNews();
+            }
+        });
+
+        // Logout Button
+        const adminUserEl = document.querySelector(".admin-user");
+        if (adminUserEl) {
+            adminUserEl.innerHTML = `👤 Admin | <button id="logoutBtn" style="background:#c40000;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-left:8px;">Logout</button>`;
+            document.getElementById("logoutBtn").addEventListener("click", async () => {
+                await signOut(auth);
+                window.location.href = "login.html";
+            });
+        }
+
+        async function loadDashboardNews() {
+            const container = document.getElementById("newsContainer");
+            try {
+                const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+
+                const newsList = [];
+                snapshot.forEach((docSnap) => {
+                    newsList.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Stats update karein
+                document.getElementById("totalCount").innerText = newsList.length;
+                document.getElementById("publishedCount").innerText = newsList.length;
+                document.getElementById("featuredCount").innerText = newsList.filter(n => n.featuredNews).length;
+                document.getElementById("breakingCount").innerText = newsList.filter(n => n.breakingNews).length;
+
+                if (newsList.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-news">
+                            <div class="empty-icon">📰</div>
+                            <h3>अभी कोई News नहीं है</h3>
+                            <p>अपनी पहली news publish करने के लिए "Add News" पर क्लिक करें।</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Table banayein
+                let tableHTML = `
+                    <table class="news-list-table">
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Headline</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                newsList.forEach(news => {
+                    const imgTag = news.imageUrl
+                        ? `<img src="${news.imageUrl}" class="news-thumb" alt="thumb">`
+                        : `<div class="news-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:#777;">No Img</div>`;
+
+                    const statusBadges = `
+                        ${news.breakingNews ? '<span class="badge badge-breaking">🔴 Breaking</span>' : ''}
+                        ${news.featuredNews ? '<span class="badge">⭐ Featured</span>' : ''}
+                        ${!news.breakingNews && !news.featuredNews ? '<span class="badge">Normal</span>' : ''}
+                    `;
+
+                    tableHTML += `
+                        <tr>
+                            <td>${imgTag}</td>
+                            <td><strong>${news.headline}</strong><br><small style="color:#666;">📍 ${news.location || "बिहार"}</small></td>
+                            <td><span class="badge">${news.category}</span></td>
+                            <td>${statusBadges}</td>
+                            <td>${news.date || ""}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="add-news.html?edit=${news.id}" class="edit-btn">✏️ Edit</a>
+                                    <button class="delete-btn" data-id="${news.id}">🗑️ Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `</tbody></table>`;
+                container.innerHTML = tableHTML;
+
+                // Delete button event listeners
+                document.querySelectorAll(".delete-btn").forEach(btn => {
+                    btn.addEventListener("click", async function () {
+                        const newsId = this.getAttribute("data-id");
+                        const confirmDelete = confirm("क्या आप वाकई इस खबर को हमेशा के लिए Delete करना चाहते हैं?");
+                        if (!confirmDelete) return;
+
+                        this.disabled = true;
+                        this.innerText = "Deleting...";
+                        try {
+                            await deleteDoc(doc(db, "news", newsId));
+                            alert("खबर Delete हो गई!");
+                            loadDashboardNews();
+                        } catch (err) {
+                            alert("Delete करने में समस्या आई: " + err.message);
+                            this.disabled = false;
+                            this.innerText = "🗑️ Delete";
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error("Dashboard load error:", error);
+                container.innerHTML = `<p style="color:red; padding:15px;">डेटा लोड करने में त्रुटि: ${error.message}</p>`;
+            }
+        }
+    </script>
+
+</body>
+</html>

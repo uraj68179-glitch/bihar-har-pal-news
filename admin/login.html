@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Bihar Har Pal News</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background: #fff;
+            padding: 35px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            border-top: 5px solid #c40000;
+        }
+        .login-box h2 {
+            margin-bottom: 5px;
+            color: #222;
+        }
+        .login-box p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        .login-btn {
+            width: 100%;
+            background: #c40000;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #9e0000;
+        }
+        .error-msg {
+            color: #c40000;
+            font-size: 14px;
+            margin-top: 12px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>🔐 Admin Login</h2>
+        <p>Bihar Har Pal News - केवल अधिकृत उपयोग के लिए</p>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="Admin Email लिखें" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Password लिखें" required>
+            </div>
+
+            <button type="submit" id="loginBtn" class="login-btn">Login करें</button>
+            <div id="errorMsg" class="error-msg"></div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcZtid0O23fr5J1AySK6ptZfPveITMReU",
+            authDomain: "bihar-har-pal-news-52a25.firebaseapp.com",
+            projectId: "bihar-har-pal-news-52a25",
+            storageBucket: "bihar-har-pal-news-52a25.firebasestorage.app",
+            messagingSenderId: "25215359679",
+            appId: "1:25215359679:web:3c069cb8d7cdaa2e32040a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Agar pehle se login hain toh seedha add-news.html par bhej dein
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = "add-news.html";
+            }
+        });
+
+        const loginForm = document.getElementById("loginForm");
+        const errorMsg = document.getElementById("errorMsg");
+        const loginBtn = document.getElementById("loginBtn");
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorMsg.style.display = "none";
+            loginBtn.disabled = true;
+            loginBtn.innerText = "जाँच हो रही है...";
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = "add-news.html";
+            } catch (error) {
+                errorMsg.innerText = "❌ गलत Email या Password! कृपया पुनः प्रयास करें।";
+                errorMsg.style.display = "block";
+                loginBtn.disabled = false;
+                loginBtn.innerText = "Login करें";
+            }
+        });
+    </script>
+
+</body>
+</html>
