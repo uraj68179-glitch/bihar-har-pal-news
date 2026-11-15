@@ -3,136 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bihar Har Pal News - Latest India & World News</title>
+    <title>Bihar Har Pal News - बिहार की हर खबर, हर पल</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Dynamic images & clickable cards ke liye thodi extra styling */
-        .news-image img, .card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            border-radius: 4px;
-        }
-        .main-news, .latest-item, .news-card {
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .main-news:hover, .news-card:hover {
-            transform: translateY(-2px);
-        }
-        /* Full News Popup Modal */
-        .news-modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .news-modal-content {
-            background: #fff;
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 8px;
-            position: relative;
-        }
-        .close-modal {
-            position: absolute;
-            right: 20px;
-            top: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #c40000;
-        }
-        .modal-img {
-            width: 100%;
-            max-height: 420px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin: 15px 0;
-        }
-    </style>
 </head>
-
 <body>
 
-    <!-- Top Bar -->
+    <!-- Top Utility Bar -->
     <div class="top-bar">
-        <div class="container">
-            <span id="live-date">आज की ताज़ा खबरें</span>
-            <span>भारत और दुनिया की ताज़ा खबरें</span>
+        <div class="container top-bar-flex">
+            <div class="top-left">
+                <span id="live-date">आज की ताज़ा खबरें</span>
+                <span class="dot-sep">•</span>
+                <span>📍 बिहार | मुजफ्फरपुर | पटना | नई दिल्ली</span>
+            </div>
+            <div class="top-right">
+                <a href="#footer-contact" class="advertise-link">📢 विज्ञापन दें (Advertise)</a>
+                <a href="admin/login.html" class="admin-pill">🔐 रिपोर्टर लॉगिन</a>
+            </div>
         </div>
     </div>
 
-    <!-- Header -->
+    <!-- Masthead Header + Header Ad Slot -->
     <header class="header">
         <div class="container header-content">
             <div class="brand">
-                <a href="index.html">
+                <a href="index.html" class="logo-link">
                     <img src="images/logo.jpg" alt="Bihar Har Pal News Logo">
                 </a>
                 <div class="brand-text">
+                    <span class="live-badge">● LIVE HINDI NEWS PORTAL</span>
                     <h1>BIHAR HAR PAL NEWS</h1>
-                    <p>बिहार की हर खबर, हर पल</p>
+                    <p>बिहार की हर खबर, हर पल — सच के साथ</p>
                 </div>
             </div>
 
-            <div class="header-right">
-                <div class="date-box">
-                    <strong>📰 हिंदी न्यूज़ पोर्टल</strong>
-                    <span>भारत और दुनिया की ताज़ा खबरें</span>
+            <!-- AD SLOT 1: Top Header Leaderboard (728x90) -->
+            <div class="ad-slot ad-header" id="ad-slot-header">
+                <span class="ad-tag">विज्ञापन • AD</span>
+                <div class="ad-box-inner">
+                    <strong>यहाँ अपना विज्ञापन दें (728×90)</strong>
+                    <small>बिहार और मुजफ्फरपुर के लाखों पाठकों तक पहुँचें • संपर्क करें</small>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Navigation -->
+    <!-- Sticky Navigation + Search -->
     <nav class="navbar">
-        <div class="container nav-content" id="category-nav">
-            <a href="#" data-cat="ALL">होम</a>
-            <a href="#" data-cat="बिहार">बिहार</a>
-            <a href="#" data-cat="भारत">भारत</a>
-            <a href="#" data-cat="दुनिया">दुनिया</a>
-            <a href="#" data-cat="राजनीति">राजनीति</a>
-            <a href="#" data-cat="खेल">खेल</a>
-            <a href="#" data-cat="बिजनेस">बिजनेस</a>
-            <a href="#" data-cat="मनोरंजन">मनोरंजन</a>
-            <a href="#" data-cat="टेक्नोलॉजी">टेक्नोलॉजी</a>
+        <div class="container nav-wrapper">
+            <div class="nav-content" id="category-nav">
+                <a href="#" data-cat="ALL" class="active">होम</a>
+                <a href="#" data-cat="बिहार">बिहार</a>
+                <a href="#" data-cat="भारत">भारत</a>
+                <a href="#" data-cat="दुनिया">दुनिया</a>
+                <a href="#" data-cat="राजनीति">राजनीति</a>
+                <a href="#" data-cat="खेल">खेल</a>
+                <a href="#" data-cat="बिजनेस">बिजनेस</a>
+                <a href="#" data-cat="मनोरंजन">मनोरंजन</a>
+                <a href="#" data-cat="टेक्नोलॉजी">टेक्नोलॉजी</a>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="खबर खोजें...">
+            </div>
         </div>
     </nav>
 
-    <!-- Breaking News -->
+    <!-- Live Breaking News Ticker -->
     <div class="breaking">
         <div class="container breaking-content">
-            <strong>🔴 BREAKING NEWS</strong>
-            <div class="breaking-text" id="breaking-news-text">
-                बिहार और देश-दुनिया की बड़ी खबरें यहां पढ़ें...
+            <div class="breaking-label">
+                <span class="pulse-dot"></span> BREAKING NEWS
+            </div>
+            <div class="breaking-marquee">
+                <div class="breaking-text" id="breaking-news-text">
+                    बिहार और देश-दुनिया की बड़ी खबरें लोड हो रही हैं...
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Portal Body -->
     <main class="container">
 
-        <!-- Category Filter Results (Jab user navbar par kisi category par click karega) -->
+        <!-- Category / Search Filter Results -->
         <section class="news-section" id="filtered-section" style="display: none;">
             <div class="section-heading">
                 <h2 id="filtered-title">खबरें</h2>
-                <a href="#" id="reset-filter">← सभी खबरें देखें</a>
+                <a href="#" id="reset-filter" class="reset-btn">✕ फ़िल्टर हटाएं</a>
             </div>
             <div class="news-grid" id="filtered-grid"></div>
         </section>
 
-        <!-- Featured & Latest Section -->
+        <!-- Hero Lead + Latest Sidebar -->
         <section class="featured" id="home-featured-section">
-            <!-- Main Featured News -->
+            <!-- Main Lead Story -->
             <article class="main-news" id="featured-main">
                 <div class="news-image">खबर लोड हो रही है...</div>
                 <div class="news-content">
@@ -145,40 +112,94 @@
             <!-- Latest News Sidebar -->
             <aside class="latest">
                 <div class="section-title">
-                    <h2>लेटेस्ट न्यूज़</h2>
+                    <h2>⚡ लेटेस्ट न्यूज़</h2>
+                    <span>ताज़ा अपडेट</span>
                 </div>
-                <div id="latest-news-list">
-                    <p style="padding:10px; color:#666;">लोड हो रहा है...</p>
+                <div id="latest-news-list" class="latest-list">
+                    <p style="padding:15px; color:#666;">लोड हो रहा है...</p>
                 </div>
             </aside>
         </section>
 
-        <!-- Bihar News -->
-        <section class="news-section" id="bihar-section">
-            <div class="section-heading">
-                <h2>बिहार न्यूज़</h2>
-                <a href="#" data-cat-link="बिहार">और खबरें →</a>
+        <!-- AD SLOT 2: Mid-Page Horizontal Banner (970x90) -->
+        <div class="ad-slot ad-banner-wide" id="ad-slot-mid">
+            <span class="ad-tag">SPONSORED • विज्ञापन</span>
+            <div class="ad-box-inner">
+                <strong>आपका व्यापार, हमारी पहचान — विज्ञापन के लिए संपर्क करें (970×90)</strong>
+                <small>स्कूल, कॉलेज, हॉस्पिटल, शोरूम और लोकल ब्रांड प्रमोशन उपलब्ध</small>
             </div>
-            <div class="news-grid" id="bihar-news-grid"></div>
-        </section>
+        </div>
 
-        <!-- India News -->
-        <section class="news-section" id="india-section">
-            <div class="section-heading">
-                <h2>भारत न्यूज़</h2>
-                <a href="#" data-cat-link="भारत">और खबरें →</a>
-            </div>
-            <div class="news-grid" id="india-news-grid"></div>
-        </section>
+        <!-- Two-Column Layout: Left Category Grids + Right Sticky Ad & Trending Sidebar -->
+        <div class="portal-layout">
+            <div class="portal-main-col">
 
-        <!-- World News -->
-        <section class="news-section" id="world-section">
-            <div class="section-heading">
-                <h2>विश्व न्यूज़</h2>
-                <a href="#" data-cat-link="दुनिया">और खबरें →</a>
+                <!-- Bihar News -->
+                <section class="news-section" id="bihar-section">
+                    <div class="section-heading">
+                        <h2>बिहार न्यूज़</h2>
+                        <a href="#" data-cat-link="बिहार">सभी देखें →</a>
+                    </div>
+                    <div class="news-grid two-col-grid" id="bihar-news-grid"></div>
+                </section>
+
+                <!-- Politics & India News -->
+                <section class="news-section" id="india-section">
+                    <div class="section-heading">
+                        <h2>भारत व राजनीति</h2>
+                        <a href="#" data-cat-link="भारत">सभी देखें →</a>
+                    </div>
+                    <div class="news-grid two-col-grid" id="india-news-grid"></div>
+                </section>
+
+                <!-- World, Sports & Entertainment -->
+                <section class="news-section" id="world-section">
+                    <div class="section-heading">
+                        <h2>दुनिया, खेल व मनोरंजन</h2>
+                        <a href="#" data-cat-link="दुनिया">सभी देखें →</a>
+                    </div>
+                    <div class="news-grid two-col-grid" id="world-news-grid"></div>
+                </section>
+
             </div>
-            <div class="news-grid" id="world-news-grid"></div>
-        </section>
+
+            <!-- Right Sticky Sidebar (Ads + Quick Links) -->
+            <aside class="portal-side-col">
+                <!-- AD SLOT 3: Sidebar Square Ad (300x250) -->
+                <div class="ad-slot ad-square" id="ad-slot-sidebar-1">
+                    <span class="ad-tag">विज्ञापन • 300×250</span>
+                    <div class="ad-square-box">
+                        <h4>📢 आपका विज्ञापन यहाँ</h4>
+                        <p>अपने व्यवसाय को पूरे बिहार में पहुँचाएं।</p>
+                        <a href="#footer-contact" class="ad-cta-btn">बुक करें</a>
+                    </div>
+                </div>
+
+                <!-- Quick Category Box -->
+                <div class="sidebar-widget">
+                    <div class="widget-header">📂 प्रमुख श्रेणियां</div>
+                    <div class="tag-cloud" id="sidebar-tags">
+                        <button data-cat-link="बिहार">#बिहार</button>
+                        <button data-cat-link="राजनीति">#राजनीति</button>
+                        <button data-cat-link="भारत">#भारत</button>
+                        <button data-cat-link="खेल">#खेल</button>
+                        <button data-cat-link="बिजनेस">#बिजनेस</button>
+                        <button data-cat-link="मनोरंजन">#मनोरंजन</button>
+                        <button data-cat-link="टेक्नोलॉजी">#टेक्नोलॉजी</button>
+                        <button data-cat-link="दुनिया">#दुनिया</button>
+                    </div>
+                </div>
+
+                <!-- AD SLOT 4: Sticky Vertical Ad (300x600) -->
+                <div class="ad-slot ad-vertical sticky-ad" id="ad-slot-sidebar-2">
+                    <span class="ad-tag">विज्ञापन • 300×400</span>
+                    <div class="ad-square-box tall">
+                        <h4>🚀 डिजिटल प्रचार</h4>
+                        <p>Bihar Har Pal News पर बैनर और वीडियो विज्ञापन के लिए आज ही जुड़ें।</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
 
     </main>
 
@@ -186,18 +207,62 @@
     <div id="newsModal" class="news-modal">
         <div class="news-modal-content">
             <span class="close-modal" id="closeModal">&times;</span>
-            <span id="modalCategory" class="category" style="background:#c40000; color:#fff; padding:4px 10px; border-radius:4px; font-size:13px;"></span>
-            <h1 id="modalHeadline" style="margin: 12px 0; font-size: 26px; line-height: 1.4;"></h1>
-            <p id="modalMeta" style="color: #666; font-size: 14px; margin-bottom: 10px;"></p>
+            <span id="modalCategory" class="category"></span>
+            <h1 id="modalHeadline"></h1>
+            <div class="modal-meta-bar">
+                <p id="modalMeta"></p>
+                <div class="share-buttons">
+                    <button id="whatsappShareBtn" class="share-btn wa">📲 WhatsApp शेयर</button>
+                    <button id="copyLinkBtn" class="share-btn copy">🔗 लिंक कॉपी</button>
+                </div>
+            </div>
             <img id="modalImage" class="modal-img" src="" alt="" style="display:none;">
-            <div id="modalFullNews" style="font-size: 17px; line-height: 1.8; color: #222; white-space: pre-line;"></div>
+
+            <!-- AD SLOT 5: In-Article Reader Banner -->
+            <div class="ad-slot ad-in-article" id="ad-slot-article">
+                <span class="ad-tag">विज्ञापन</span>
+                <div class="ad-box-inner">
+                    <strong>विज्ञापन स्थान (In-Article Banner)</strong>
+                </div>
+            </div>
+
+            <div id="modalFullNews" class="modal-body-text"></div>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container footer-content"></div>
+    <!-- Bold Newspaper Footer -->
+    <footer class="footer" id="footer-contact">
+        <div class="container footer-content">
+            <div class="footer-about">
+                <div class="footer-brand">
+                    <img src="images/logo.jpg" alt="Logo">
+                    <div>
+                        <h2>BIHAR HAR PAL NEWS</h2>
+                        <span>बिहार की हर खबर, हर पल</span>
+                    </div>
+                </div>
+                <p>बिहार, मुजफ्फरपुर और देश-दुनिया की तेज़, निष्पक्ष और विश्वसनीय खबरों का प्रमुख डिजिटल न्यूज़ पोर्टल।</p>
+            </div>
+
+            <div class="footer-links">
+                <h3>श्रेणियां</h3>
+                <ul>
+                    <li><a href="#" data-cat-link="बिहार">बिहार समाचार</a></li>
+                    <li><a href="#" data-cat-link="राजनीति">राजनीति</a></li>
+                    <li><a href="#" data-cat-link="भारत">राष्ट्रीय खबरें</a></li>
+                    <li><a href="#" data-cat-link="खेल">खेल जगत</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact-box">
+                <h3>विज्ञापन एवं संपर्क</h3>
+                <p>📍 साहेबगंज, मुजफ्फरपुर, बिहार</p>
+                <p>📧 समाचार व विज्ञापन हेतु संपर्क करें</p>
+                <a href="admin/login.html" class="footer-admin-btn">स्टाफ / एडमिन पैनल →</a>
+            </div>
+        </div>
         <div class="copyright">
-            © 2026 Bihar Har Pal News. All Rights Reserved.
+            © 2026 Bihar Har Pal News. All Rights Reserved. | Designed for Bold Journalism
         </div>
     </footer>
 
