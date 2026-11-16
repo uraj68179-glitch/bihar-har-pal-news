@@ -50,6 +50,10 @@
         .btn-save-ad:hover {
             background: #990000;
         }
+        .btn-save-ad:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
         .ad-preview-card {
             border: 1px solid #e2e8f0;
             border-radius: 6px;
@@ -158,9 +162,8 @@
             appId: "1:25215359679:web:3c069cb8d7cdaa2e32040a"
         };
 
-        // अपनी Cloudinary डिटेल्स यहाँ डालें
-        const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME"; 
-        const CLOUDINARY_UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";
+        const CLOUDINARY_CLOUD_NAME = "wmbcrydw";
+        const CLOUDINARY_UPLOAD_PRESET = "bihar_news_preset";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -191,7 +194,9 @@
                 body: formData
             });
             const data = await res.json();
-            if (!data.secure_url) throw new Error("Cloudinary upload failed");
+            if (!res.ok || !data.secure_url) {
+                throw new Error(data.error?.message || "Cloudinary upload failed");
+            }
             return data.secure_url;
         }
 
@@ -208,13 +213,6 @@
 
                 if (fileInput.files.length === 0) {
                     alert("⚠️ कृपया विज्ञापन बैनर की फोटो चुनें!");
-                    btn.disabled = false;
-                    btn.innerText = "🚀 विज्ञापन लाइव करें";
-                    return;
-                }
-
-                if (CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME") {
-                    alert("⚠️ कृपया manage-ads.html में अपना Cloudinary Cloud Name और Upload Preset डालें।");
                     btn.disabled = false;
                     btn.innerText = "🚀 विज्ञापन लाइव करें";
                     return;
