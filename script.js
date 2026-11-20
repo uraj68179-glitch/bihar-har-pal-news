@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAcZtid0O23fr5J1AySK6ptZfPveITMReU",
@@ -15,6 +15,7 @@ const db = getFirestore(app);
 
 let allPublishedNews = [];
 let currentOpenNews = null;
+let currentFontSize = 17.5;
 
 // Live Hindi Date
 const liveDateEl = document.getElementById("live-date");
@@ -23,7 +24,38 @@ if (liveDateEl) {
     liveDateEl.innerText = new Date().toLocaleDateString("hi-IN", options);
 }
 
-// Live Ads Load Function (Static Banner Image)
+// Dark Mode Toggle
+const darkToggleBtn = document.getElementById("darkModeToggle");
+if (localStorage.getItem("bhp_dark_mode") === "true") {
+    document.body.classList.add("dark-mode");
+    if (darkToggleBtn) darkToggleBtn.innerText = "☀️ लाइट मोड";
+}
+
+if (darkToggleBtn) {
+    darkToggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("bhp_dark_mode", isDark);
+        darkToggleBtn.innerText = isDark ? "☀️ लाइट मोड" : "🌙 डार्क मोड";
+    });
+}
+
+// Font Size Controls in Reader Modal
+document.getElementById("fontIncreaseBtn").addEventListener("click", () => {
+    if (currentFontSize < 24) {
+        currentFontSize += 1.5;
+        document.getElementById("modalFullNews").style.fontSize = currentFontSize + "px";
+    }
+});
+
+document.getElementById("fontDecreaseBtn").addEventListener("click", () => {
+    if (currentFontSize > 14) {
+        currentFontSize -= 1.5;
+        document.getElementById("modalFullNews").style.fontSize = currentFontSize + "px";
+    }
+});
+
+// Live Ads Load Function
 async function loadLiveAds() {
     try {
         const adsSnap = await getDocs(collection(db, "ads"));
@@ -45,12 +77,25 @@ async function loadLiveAds() {
     }
 }
 
-// Full News Reader Modal
-function openNewsModal(news) {
+// Direct Share URL Helper (?news=ID)
+function getDirectNewsUrl(newsId) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set("news", newsId);
+    return url.toString();
+}
+
+// Full News Reader Modal + Live View Increment
+async function openNewsModal(news) {
     currentOpenNews = news;
+    const updatedViews = (news.views || 0) + 1;
+    news.views = updatedViews;
+
+    // Update browser URL cleanly so user can share directly
+    window.history.replaceState({}, "", `?news=${news.id}`);
+
     document.getElementById("modalCategory").innerText = news.category || "समाचार";
     document.getElementById("modalHeadline").innerText = news.headline;
-    document.getElementById("modalMeta").innerText = `📍 ${news.location || "बिहार"}  |  📅 ${news.date || ""}`;
+    document.getElementById("modalMeta").innerText = `📍 ${news.location || "बिहार"}  |  📅 ${news.date || ""}  |  👁️ ${updatedViews} बार पढ़ा गया`;
 
     const modalImg = document.getElementById("modalImage");
     if (news.imageUrl) {
@@ -62,26 +107,39 @@ function openNewsModal(news) {
 
     document.getElementById("modalFullNews").innerText = news.fullNews;
     document.getElementById("newsModal").style.display = "block";
+
+    // Increment views in Firestore
+    try {
+        await updateDoc(doc(db, "news", news.id), {
+            views: increment(1)
+        });
+    } catch (e) {
+        console.warn("View count update skipped:", e.message);
+    }
+}
+
+function closeNewsModal() {
+    document.getElementById("newsModal").style.display = "none";
+    window.history.replaceState({}, "", window.location.pathname);
 }
 
 document.getElementById("whatsappShareBtn").addEventListener("click", () => {
     if (!currentOpenNews) return;
-    const text = `📰 *${currentOpenNews.headline}*\n\nपूरी खबर पढ़ें Bihar Har Pal News पर:\n${window.location.href}`;
+    const directLink = getDirectNewsUrl(currentOpenNews.id);
+    const text = `📰 *${currentOpenNews.headline}*\n\nपूरी खबर पढ़ें Bihar Har Pal News पर:\n${directLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 });
 
 document.getElementById("copyLinkBtn").addEventListener("click", () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("✅ वेबसाइट लिंक कॉपी हो गया है!");
+    if (!currentOpenNews) return;
+    const directLink = getDirectNewsUrl(currentOpenNews.id);
+    navigator.clipboard.writeText(directLink);
+    alert("✅ इस खबर का डायरेक्ट लिंक कॉपी हो गया है!");
 });
 
-document.getElementById("closeModal").addEventListener("click", () => {
-    document.getElementById("newsModal").style.display = "none";
-});
+document.getElementById("closeModal").addEventListener("click", closeNewsModal);
 window.addEventListener("click", (e) => {
-    if (e.target.id === "newsModal") {
-        document.getElementById("newsModal").style.display = "none";
-    }
+    if (e.target.id === "newsModal") closeNewsModal();
 });
 
 function createNewsCard(news) {
@@ -95,7 +153,10 @@ function createNewsCard(news) {
     card.innerHTML = `
         <div class="card-image">${imageHtml}</div>
         <div class="card-body">
-            <span class="card-meta-tag">📍 ${news.location ? news.location : news.category}</span>
+            <div class="card-meta-row">
+                <span class="card-meta-tag">📍 ${news.location ? news.location : news.category}</span>
+                <span class="card-views">👁️ ${news.views || 0}</span>
+            </div>
             <h3>${news.headline}</h3>
             <p>${news.shortDescription || news.fullNews.substring(0, 95) + "..."}</p>
         </div>
@@ -105,14 +166,38 @@ function createNewsCard(news) {
     return card;
 }
 
+function renderTrendingSidebar() {
+    const trendEl = document.getElementById("trending-news-list");
+    if (!trendEl) return;
+
+    const sortedByViews = [...allPublishedNews]
+        .sort((a, b) => (b.views || 0) - (a.views || 0))
+        .slice(0, 5);
+
+    trendEl.innerHTML = "";
+    sortedByViews.forEach((news, index) => {
+        const div = document.createElement("div");
+        div.className = "trending-item";
+        div.innerHTML = `
+            <span class="trend-rank">${index + 1}</span>
+            <div>
+                <h4>${news.headline}</h4>
+                <small>📍 ${news.location || news.category} • 👁️ ${news.views || 0} views</small>
+            </div>
+        `;
+        div.addEventListener("click", () => openNewsModal(news));
+        trendEl.appendChild(div);
+    });
+}
+
 async function loadNews() {
     try {
         const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
         allPublishedNews = [];
-        querySnapshot.forEach((doc) => {
-            allPublishedNews.push({ id: doc.id, ...doc.data() });
+        querySnapshot.forEach((docSnap) => {
+            allPublishedNews.push({ id: docSnap.id, views: 0, ...docSnap.data() });
         });
 
         if (allPublishedNews.length === 0) {
@@ -138,7 +223,7 @@ async function loadNews() {
                 <span class="category">${featuredNews.category || "बिहार"}</span>
                 <h2>${featuredNews.headline}</h2>
                 <p>${featuredNews.shortDescription || featuredNews.fullNews.substring(0, 150) + "..."}</p>
-                <span class="date">📍 ${featuredNews.location || "बिहार"}  •  📅 ${featuredNews.date || ""}</span>
+                <span class="date">📍 ${featuredNews.location || "बिहार"}  •  📅 ${featuredNews.date || ""}  •  👁️ ${featuredNews.views || 0} बार पढ़ा गया</span>
             </div>
         `;
         featuredMain.onclick = () => openNewsModal(featuredNews);
@@ -157,7 +242,7 @@ async function loadNews() {
                 <div class="latest-info">
                     <span>${news.category}</span>
                     <h3>${news.headline}</h3>
-                    <small>📅 ${news.date || ""}</small>
+                    <small>📅 ${news.date || ""} • 👁️ ${news.views || 0}</small>
                 </div>
             `;
             item.addEventListener("click", () => openNewsModal(news));
@@ -167,6 +252,15 @@ async function loadNews() {
         renderMultiCategoryGrid(["बिहार"], "bihar-news-grid", 4);
         renderMultiCategoryGrid(["भारत", "राजनीति", "बिजनेस"], "india-news-grid", 4);
         renderMultiCategoryGrid(["दुनिया", "खेल", "मनोरंजन", "टेक्नोलॉजी"], "world-news-grid", 4);
+        renderTrendingSidebar();
+
+        // Check if URL has ?news=DOC_ID and auto-open that story
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedNewsId = urlParams.get("news");
+        if (sharedNewsId) {
+            const targetNews = allPublishedNews.find(n => n.id === sharedNewsId);
+            if (targetNews) openNewsModal(targetNews);
+        }
 
     } catch (error) {
         console.error("Error loading news:", error);
@@ -181,7 +275,7 @@ function renderMultiCategoryGrid(categoriesArray, gridId, limitCount) {
     grid.innerHTML = "";
 
     if (catNews.length === 0) {
-        grid.innerHTML = `<p style="color:#64748b; padding:12px; background:#fff; border-radius:6px;">इस श्रेणी में अभी कोई खबर नहीं है।</p>`;
+        grid.innerHTML = `<p style="color:#64748b; padding:12px; background:var(--card-bg); border-radius:6px;">इस श्रेणी में अभी कोई खबर नहीं है।</p>`;
         return;
     }
 
@@ -190,12 +284,14 @@ function renderMultiCategoryGrid(categoriesArray, gridId, limitCount) {
     });
 }
 
+// Category Filter
 document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
     link.addEventListener("click", (e) => {
         e.preventDefault();
         const selectedCat = link.getAttribute("data-cat") || link.getAttribute("data-cat-link");
 
         document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
+        document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
         const matchingNav = document.querySelector(`#category-nav a[data-cat="${selectedCat}"]`);
         if (matchingNav) matchingNav.classList.add("active");
 
@@ -211,7 +307,7 @@ document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
         grid.innerHTML = "";
 
         if (matched.length === 0) {
-            grid.innerHTML = `<p style="padding:15px; color:#64748b; background:#fff; border-radius:6px;">${selectedCat} श्रेणी में अभी कोई खबर प्रकाशित नहीं हुई है।</p>`;
+            grid.innerHTML = `<p style="padding:15px; color:#64748b; background:var(--card-bg); border-radius:6px;">${selectedCat} श्रेणी में अभी कोई खबर प्रकाशित नहीं हुई है।</p>`;
         } else {
             matched.forEach(news => grid.appendChild(createNewsCard(news)));
         }
@@ -221,6 +317,36 @@ document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
     });
 });
 
+// District Filter Bar
+document.querySelectorAll("#district-filter-bar button").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const district = btn.getAttribute("data-dist");
+        document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const matched = allPublishedNews.filter(n =>
+            (n.location && n.location.includes(district)) ||
+            (n.headline && n.headline.includes(district)) ||
+            (n.fullNews && n.fullNews.includes(district))
+        );
+
+        const filteredSec = document.getElementById("filtered-section");
+        document.getElementById("filtered-title").innerText = `📍 ${district} की खबरें (${matched.length})`;
+        const grid = document.getElementById("filtered-grid");
+        grid.innerHTML = "";
+
+        if (matched.length === 0) {
+            grid.innerHTML = `<p style="padding:15px; color:#64748b; background:var(--card-bg); border-radius:6px;">${district} की अभी कोई खबर प्रकाशित नहीं हुई है।</p>`;
+        } else {
+            matched.forEach(news => grid.appendChild(createNewsCard(news)));
+        }
+
+        filteredSec.style.display = "block";
+        filteredSec.scrollIntoView({ behavior: "smooth" });
+    });
+});
+
+// Live Search
 const searchInput = document.getElementById("searchInput");
 if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -249,6 +375,7 @@ document.getElementById("reset-filter").addEventListener("click", (e) => {
     e.preventDefault();
     document.getElementById("filtered-section").style.display = "none";
     document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
+    document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
     document.querySelector('#category-nav a[data-cat="ALL"]').classList.add("active");
 });
 
