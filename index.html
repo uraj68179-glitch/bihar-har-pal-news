@@ -20,7 +20,8 @@
                 <span>📍 बिहार | मुजफ्फरपुर | पटना | नई दिल्ली</span>
             </div>
             <div class="top-right">
-                <a href="#footer-contact" class="advertise-link">📢 विज्ञापन दें (Advertise)</a>
+                <button id="darkModeToggle" class="theme-btn" title="Dark / Light Mode">🌙 डार्क मोड</button>
+                <a href="#footer-contact" class="advertise-link">📢 विज्ञापन दें</a>
                 <a href="admin/login.html" class="admin-pill">🔐 रिपोर्टर लॉगिन</a>
             </div>
         </div>
@@ -85,10 +86,28 @@
         </div>
     </div>
 
+    <!-- Bihar District Quick Filter Bar -->
+    <div class="district-bar">
+        <div class="container district-flex">
+            <span class="district-label">📍 अपना जिला चुनें:</span>
+            <div class="district-pills" id="district-filter-bar">
+                <button data-dist="मुजफ्फरपुर">मुजफ्फरपुर</button>
+                <button data-dist="साहेबगंज">साहेबगंज</button>
+                <button data-dist="पटना">पटना</button>
+                <button data-dist="दरभंगा">दरभंगा</button>
+                <button data-dist="गया">गया</button>
+                <button data-dist="भागलपुर">भागलपुर</button>
+                <button data-dist="पूर्णिया">पूर्णिया</button>
+                <button data-dist="सारण">सारण</button>
+                <button data-dist="चंपारण">चंपारण</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Portal Body -->
     <main class="container">
 
-        <!-- Category / Search Filter Results -->
+        <!-- Category / District / Search Filter Results -->
         <section class="news-section" id="filtered-section" style="display: none;">
             <div class="section-heading">
                 <h2 id="filtered-title">खबरें</h2>
@@ -163,7 +182,7 @@
 
             </div>
 
-            <!-- Right Sticky Sidebar (Ads + Quick Links) -->
+            <!-- Right Sticky Sidebar (Ads + Trending + Quick Links) -->
             <aside class="portal-side-col">
                 <!-- AD SLOT 3: Sidebar Square Ad (300x250) -->
                 <div class="ad-slot ad-square" id="ad-slot-sidebar-1">
@@ -172,6 +191,14 @@
                         <h4>📢 आपका विज्ञापन यहाँ</h4>
                         <p>अपने व्यवसाय को पूरे बिहार में पहुँचाएं।</p>
                         <a href="#footer-contact" class="ad-cta-btn">बुक करें</a>
+                    </div>
+                </div>
+
+                <!-- Most Read / Trending News Widget -->
+                <div class="sidebar-widget">
+                    <div class="widget-header">🔥 सबसे ज्यादा पढ़ी गई खबरें</div>
+                    <div id="trending-news-list" class="trending-list">
+                        <p style="color:#64748b; font-size:13px;">लोड हो रहा है...</p>
                     </div>
                 </div>
 
@@ -212,8 +239,10 @@
             <div class="modal-meta-bar">
                 <p id="modalMeta"></p>
                 <div class="share-buttons">
+                    <button id="fontDecreaseBtn" class="share-btn font-ctrl" title="अक्षर छोटा करें">A-</button>
+                    <button id="fontIncreaseBtn" class="share-btn font-ctrl" title="अक्षर बड़ा करें">A+</button>
                     <button id="whatsappShareBtn" class="share-btn wa">📲 WhatsApp शेयर</button>
-                    <button id="copyLinkBtn" class="share-btn copy">🔗 लिंक कॉपी</button>
+                    <button id="copyLinkBtn" class="share-btn copy">🔗 डायरेक्ट लिंक</button>
                 </div>
             </div>
             <img id="modalImage" class="modal-img" src="" alt="" style="display:none;">
