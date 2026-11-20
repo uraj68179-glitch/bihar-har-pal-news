@@ -8,9 +8,18 @@
     --navy-dark: #0f172a;
     --charcoal: #18181b;
     --bg-gray: #f1f5f9;
+    --card-bg: #ffffff;
     --border-color: #e2e8f0;
     --text-main: #1e293b;
     --text-muted: #64748b;
+}
+
+body.dark-mode {
+    --bg-gray: #0b1120;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
 }
 
 * {
@@ -24,6 +33,7 @@ body {
     background: var(--bg-gray);
     color: var(--text-main);
     line-height: 1.6;
+    transition: background 0.25s, color 0.25s;
 }
 
 a {
@@ -69,7 +79,22 @@ a {
 .top-right {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+}
+
+.theme-btn {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.theme-btn:hover {
+    background: var(--primary-red);
 }
 
 .advertise-link {
@@ -95,7 +120,7 @@ a {
 ========================================== */
 
 .header {
-    background: #ffffff;
+    background: var(--card-bg);
     padding: 16px 0;
     border-bottom: 1px solid var(--border-color);
 }
@@ -119,7 +144,7 @@ a {
     height: 84px;
     object-fit: contain;
     border-radius: 6px;
-    border: 2px solid #f1f5f9;
+    border: 2px solid var(--border-color);
 }
 
 .live-badge {
@@ -138,7 +163,7 @@ a {
     font-family: 'Noto Sans Devanagari', Georgia, serif;
     font-size: 30px;
     font-weight: 800;
-    color: var(--navy-dark);
+    color: var(--text-main);
     letter-spacing: -0.5px;
     line-height: 1.1;
 }
@@ -155,7 +180,7 @@ a {
 ========================================== */
 
 .ad-slot {
-    background: #f8fafc;
+    background: var(--card-bg);
     border: 1.5px dashed #cbd5e1;
     border-radius: 6px;
     position: relative;
@@ -190,12 +215,12 @@ a {
 .ad-box-inner strong {
     display: block;
     font-size: 15px;
-    color: var(--navy-dark);
+    color: #0f172a;
 }
 
 .ad-box-inner small {
     font-size: 12px;
-    color: var(--text-muted);
+    color: #64748b;
 }
 
 .ad-banner-wide {
@@ -220,14 +245,14 @@ a {
 .ad-square {
     min-height: 250px;
     padding: 20px;
-    background: #fff;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
     margin-bottom: 22px;
 }
 
 .ad-square-box h4 {
     font-size: 18px;
-    color: var(--navy-dark);
+    color: var(--text-main);
     margin-bottom: 6px;
 }
 
@@ -250,7 +275,7 @@ a {
 .ad-vertical {
     min-height: 360px;
     padding: 20px;
-    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
 }
 
@@ -263,7 +288,7 @@ a {
     min-height: 75px;
     margin: 18px 0;
     padding: 12px;
-    background: #f8fafc;
+    background: var(--bg-gray);
 }
 
 /* ==========================================
@@ -320,18 +345,17 @@ a {
     font-size: 13.5px;
     width: 210px;
     background: #ffffff;
-    color: var(--navy-dark);
+    color: #0f172a;
     outline: none;
 }
 
 /* ==========================================
-   BREAKING NEWS TICKER
+   BREAKING NEWS TICKER & DISTRICT BAR
 ========================================== */
 
 .breaking {
-    background: #ffffff;
+    background: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
 .breaking-content {
@@ -376,8 +400,54 @@ a {
 .breaking-text {
     font-size: 14px;
     font-weight: 700;
-    color: var(--navy-dark);
+    color: var(--text-main);
     white-space: nowrap;
+}
+
+/* District Bar */
+.district-bar {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px 0;
+}
+
+.district-flex {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+}
+
+.district-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--primary-red);
+    white-space: nowrap;
+}
+
+.district-pills {
+    display: flex;
+    gap: 7px;
+}
+
+.district-pills button {
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.district-pills button:hover,
+.district-pills button.active {
+    background: var(--primary-red);
+    color: #fff;
+    border-color: var(--primary-red);
 }
 
 /* ==========================================
@@ -396,7 +466,7 @@ main.container {
 }
 
 .main-news {
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
@@ -451,7 +521,7 @@ main.container {
     font-family: 'Tiro Devanagari Hindi', Georgia, serif;
     font-size: 30px;
     line-height: 1.3;
-    color: var(--navy-dark);
+    color: var(--text-main);
     margin-bottom: 10px;
 }
 
@@ -462,7 +532,7 @@ main.container {
 }
 
 .date {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 13px;
     font-weight: 600;
 }
@@ -470,7 +540,7 @@ main.container {
 /* Latest News Sidebar with Thumbnails */
 
 .latest {
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 8px;
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
@@ -503,13 +573,13 @@ main.container {
     display: flex;
     gap: 12px;
     padding: 13px 15px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .latest-item:hover {
-    background: #f8fafc;
+    background: var(--bg-gray);
 }
 
 .latest-item:last-child {
@@ -536,12 +606,12 @@ main.container {
     font-size: 15px;
     font-weight: 700;
     line-height: 1.35;
-    color: var(--navy-dark);
+    color: var(--text-main);
     margin: 2px 0;
 }
 
 .latest-info small {
-    color: #94a3b8;
+    color: var(--text-muted);
     font-size: 11px;
 }
 
@@ -594,7 +664,7 @@ main.container {
 }
 
 .news-card {
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 7px;
     border: 1px solid var(--border-color);
     overflow: hidden;
@@ -606,8 +676,7 @@ main.container {
 
 .news-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-color: #cbd5e1;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .card-image {
@@ -640,18 +709,30 @@ main.container {
     flex-direction: column;
 }
 
+.card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
 .card-meta-tag {
     color: var(--primary-red);
     font-size: 12px;
     font-weight: 800;
-    margin-bottom: 5px;
+}
+
+.card-views {
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-weight: 600;
 }
 
 .news-card h3 {
     font-family: 'Tiro Devanagari Hindi', Georgia, serif;
     font-size: 19px;
     line-height: 1.38;
-    color: var(--navy-dark);
+    color: var(--text-main);
     margin-bottom: 8px;
 }
 
@@ -661,10 +742,10 @@ main.container {
     line-height: 1.55;
 }
 
-/* Sidebar Tag Widget */
+/* Sidebar Widgets & Trending */
 
 .sidebar-widget {
-    background: #fff;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 7px;
     padding: 16px;
@@ -674,10 +755,54 @@ main.container {
 .widget-header {
     font-size: 16px;
     font-weight: 800;
-    color: var(--navy-dark);
+    color: var(--text-main);
     border-bottom: 2px solid var(--primary-red);
     padding-bottom: 8px;
     margin-bottom: 14px;
+}
+
+.trending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.trending-item:last-child {
+    border-bottom: none;
+}
+
+.trend-rank {
+    background: var(--primary-red);
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.trending-item h4 {
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--text-main);
+    margin-bottom: 3px;
+}
+
+.trending-item:hover h4 {
+    color: var(--primary-red);
+}
+
+.trending-item small {
+    color: var(--text-muted);
+    font-size: 11.5px;
 }
 
 .tag-cloud {
@@ -687,9 +812,9 @@ main.container {
 }
 
 .tag-cloud button {
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    color: var(--navy-dark);
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 13px;
@@ -722,7 +847,8 @@ main.container {
 }
 
 .news-modal-content {
-    background: #fff;
+    background: var(--card-bg);
+    color: var(--text-main);
     max-width: 820px;
     margin: 25px auto;
     padding: 28px;
@@ -747,7 +873,7 @@ main.container {
     margin: 12px 0;
     font-size: 28px;
     line-height: 1.38;
-    color: var(--navy-dark);
+    color: var(--text-main);
 }
 
 .modal-meta-bar {
@@ -757,8 +883,8 @@ main.container {
     flex-wrap: wrap;
     gap: 10px;
     padding: 10px 0;
-    border-top: 1px solid #e2e8f0;
-    border-bottom: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 15px;
 }
 
@@ -771,6 +897,7 @@ main.container {
 .share-buttons {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .share-btn {
@@ -781,6 +908,10 @@ main.container {
     font-weight: 700;
     cursor: pointer;
     color: #fff;
+}
+
+.share-btn.font-ctrl {
+    background: #475569;
 }
 
 .share-btn.wa {
@@ -802,7 +933,7 @@ main.container {
 .modal-body-text {
     font-size: 17.5px;
     line-height: 1.85;
-    color: #1e293b;
+    color: var(--text-main);
     white-space: pre-line;
     margin-top: 15px;
 }
@@ -932,7 +1063,7 @@ main.container {
         border-radius: 20px;
         border: 1.5px solid var(--primary-red);
         background: #ffffff;
-        color: var(--navy-dark);
+        color: #0f172a;
     }
 }
 
