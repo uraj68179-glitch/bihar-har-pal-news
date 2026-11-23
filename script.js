@@ -198,4 +198,210 @@ async function loadNews() {
             allPublishedNews.push({ id: docSnap.id, views: 0, ...docSnap.data() });
         });
 
-        if (allPublishedNews.length
+        if (allPublishedNews.length === 0) {
+            document.getElementById("breaking-news-text").innerText = "अभी कोई खबर उपलब्ध नहीं है।";
+            return;
+        }
+
+        const breakingList = allPublishedNews.filter(n => n.breakingNews);
+        const breakingText = breakingList.length > 0
+            ? breakingList.map(n => n.headline).join("   🔴   ")
+            : allPublishedNews[0].headline;
+        document.getElementById("breaking-news-text").innerText = breakingText;
+
+        const featuredNews = allPublishedNews.find(n => n.featuredNews) || allPublishedNews[0];
+        const featuredMain = document.getElementById("featured-main");
+        const featImgHtml = featuredNews.imageUrl
+            ? `<img src="${featuredNews.imageUrl}" alt="${featuredNews.headline}">`
+            : `मुख्य खबर`;
+
+        featuredMain.innerHTML = `
+            <div class="news-image">${featImgHtml}</div>
+            <div class="news-content">
+                <span class="category">${featuredNews.category || "बिहार"}</span>
+                <h2>${featuredNews.headline}</h2>
+                <p>${featuredNews.shortDescription || featuredNews.fullNews.substring(0, 150) + "..."}</p>
+                <span class="date">📍 ${featuredNews.location || "बिहार"}  •  📅 ${featuredNews.date || ""}  •  👁️ ${featuredNews.views || 0} बार पढ़ा गया</span>
+            </div>
+        `;
+        featuredMain.onclick = () => openNewsModal(featuredNews);
+
+        const latestListEl = document.getElementById("latest-news-list");
+        latestListEl.innerHTML = "";
+        allPublishedNews.slice(0, 5).forEach(news => {
+            const item = document.createElement("article");
+            item.className = "latest-item";
+            const thumbHtml = news.imageUrl
+                ? `<img class="latest-thumb" src="${news.imageUrl}" alt="">`
+                : `<div class="latest-thumb" style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#64748b;font-size:11px;">NEWS</div>`;
+
+            item.innerHTML = `
+                ${thumbHtml}
+                <div class="latest-info">
+                    <span>${news.category}</span>
+                    <h3>${news.headline}</h3>
+                    <small>📅 ${news.date || ""} • 👁️ ${news.views || 0}</small>
+                </div>
+            `;
+            item.addEventListener("click", () => openNewsModal(news));
+            latestListEl.appendChild(item);
+        });
+
+        renderMultiCategoryGrid(["बिहार"], "bihar-news-grid", 4);
+        renderMultiCategoryGrid(["भारत", "राजनीति", "बिजनेस"], "india-news-grid", 4);
+        renderMultiCategoryGrid(["दुनिया", "खेल", "मनोरंजन", "टेक्नोलॉजी"], "world-news-grid", 4);
+        renderTrendingSidebar();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedNewsId = urlParams.get("news");
+        if (sharedNewsId) {
+            const targetNews = allPublishedNews.find(n => n.id === sharedNewsId);
+            if (targetNews) openNewsModal(targetNews);
+        }
+
+    } catch (error) {
+        console.error("Error loading news:", error);
+    }
+}
+
+function renderMultiCategoryGrid(categoriesArray, gridId, limitCount) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+
+    const catNews = allPublishedNews.filter(n => categoriesArray.includes(n.category));
+    grid.innerHTML = "";
+
+    if (catNews.length === 0) {
+        grid.innerHTML = `<p style="color:#64748b; padding:12px; background:var(--card-bg); border-radius:6px;">इस श्रेणी में अभी कोई खबर नहीं है।</p>`;
+        return;
+    }
+
+    catNews.slice(0, limitCount).forEach(news => {
+        grid.appendChild(createNewsCard(news));
+    });
+}
+
+// Category Filter
+document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
+    link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const selectedCat = link.getAttribute("data-cat") || link.getAttribute("data-cat-link");
+
+        document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
+        document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
+        const matchingNav = document.querySelector(`#category-nav a[data-cat="${selectedCat}"]`);
+        if (matchingNav) matchingNav.classList.add("active");
+
+        const filteredSec = document.getElementById("filtered-section");
+        if (selectedCat === "ALL") {
+            filteredSec.style.display = "none";
+            return;
+        }
+
+        const matched = allPublishedNews.filter(n => n.category === selectedCat);
+        document.getElementById("filtered-title").innerText = `${selectedCat} की खबरें (${matched.length})`;
+        const grid = document.getElementById("filtered-grid");
+        grid.innerHTML = "";
+
+        if (matched.length === 0) {
+            grid.innerHTML = `<p style="padding:15px; color:#64748b; background:var(--card-bg); border-radius:6px;">${selectedCat} श्रेणी में अभी कोई खबर प्रकाशित नहीं हुई है।</p>`;
+        } else {
+            matched.forEach(news => grid.appendChild(createNewsCard(news)));
+        }
+
+        filteredSec.style.display = "block";
+        filteredSec.scrollIntoView({ behavior: "smooth" });
+    });
+});
+
+// District Filter Bar
+document.querySelectorAll("#district-filter-bar button").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const district = btn.getAttribute("data-dist");
+        document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const matched = allPublishedNews.filter(n =>
+            (n.location && n.location.includes(district)) ||
+            (n.headline && n.headline.includes(district)) ||
+            (n.fullNews && n.fullNews.includes(district))
+        );
+
+        const filteredSec = document.getElementById("filtered-section");
+        document.getElementById("filtered-title").innerText = `📍 ${district} की खबरें (${matched.length})`;
+        const grid = document.getElementById("filtered-grid");
+        grid.innerHTML = "";
+
+        if (matched.length === 0) {
+            grid.innerHTML = `<p style="padding:15px; color:#64748b; background:var(--card-bg); border-radius:6px;">${district} की अभी कोई खबर प्रकाशित नहीं हुई है।</p>`;
+        } else {
+            matched.forEach(news => grid.appendChild(createNewsCard(news)));
+        }
+
+        filteredSec.style.display = "block";
+        filteredSec.scrollIntoView({ behavior: "smooth" });
+    });
+});
+
+// Toggle Search Icon Dropdown
+const searchToggleBtn = document.getElementById("searchToggleBtn");
+const searchDropdown = document.getElementById("searchDropdown");
+const closeSearchBtn = document.getElementById("closeSearchBtn");
+
+if (searchToggleBtn && searchDropdown) {
+    searchToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchDropdown.classList.toggle("open");
+        if (searchDropdown.classList.contains("open")) {
+            document.getElementById("searchInput").focus();
+        }
+    });
+
+    closeSearchBtn.addEventListener("click", () => {
+        searchDropdown.classList.remove("open");
+        document.getElementById("searchInput").value = "";
+        document.getElementById("filtered-section").style.display = "none";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!searchDropdown.contains(e.target) && !searchToggleBtn.contains(e.target)) {
+            searchDropdown.classList.remove("open");
+        }
+    });
+}
+
+// Live Search
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+        const term = e.target.value.trim().toLowerCase();
+        const filteredSec = document.getElementById("filtered-section");
+        if (!term) {
+            filteredSec.style.display = "none";
+            return;
+        }
+
+        const matched = allPublishedNews.filter(n =>
+            (n.headline && n.headline.toLowerCase().includes(term)) ||
+            (n.location && n.location.toLowerCase().includes(term)) ||
+            (n.fullNews && n.fullNews.toLowerCase().includes(term))
+        );
+
+        document.getElementById("filtered-title").innerText = `"${e.target.value}" की खोज (${matched.length})`;
+        const grid = document.getElementById("filtered-grid");
+        grid.innerHTML = "";
+        matched.forEach(news => grid.appendChild(createNewsCard(news)));
+        filteredSec.style.display = "block";
+    });
+}
+
+document.getElementById("reset-filter").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("filtered-section").style.display = "none";
+    document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
+    document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
+    document.querySelector('#category-nav a[data-cat="ALL"]').classList.add("active");
+});
+
+loadNews();
+loadLiveAds();
