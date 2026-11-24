@@ -280,12 +280,12 @@ async function loadNews() {
             return;
         }
 
-        // Compact Breaking News Headlines
+        // Slim Breaking News Headlines (Max 45 chars per headline)
         const breakingList = allPublishedNews.filter(n => n.breakingNews);
         const sourceBreaking = breakingList.length > 0 ? breakingList : allPublishedNews.slice(0, 3);
         const breakingText = sourceBreaking
-            .map(n => n.headline.length > 65 ? n.headline.substring(0, 62) + "..." : n.headline)
-            .join("   🔴   ");
+            .map(n => n.headline.length > 45 ? n.headline.substring(0, 42) + "..." : n.headline)
+            .join("   •   ");
         document.getElementById("breaking-news-text").innerText = breakingText;
 
         // Top 5 News Slider (Featured first, then latest)
@@ -357,6 +357,7 @@ document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
 
         document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
         document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
+        if (activeDistrictBadge) activeDistrictBadge.style.display = "none";
         const matchingNav = document.querySelector(`#category-nav a[data-cat="${selectedCat}"]`);
         if (matchingNav) matchingNav.classList.add("active");
 
@@ -382,12 +383,33 @@ document.querySelectorAll("#category-nav a, [data-cat-link]").forEach(link => {
     });
 });
 
-// District Filter Bar
+// Bihar 38 Districts Collapsible Toggle & Filter
+const districtToggleBtn = document.getElementById("districtToggleBtn");
+const districtDropdownPanel = document.getElementById("districtDropdownPanel");
+const districtArrow = document.getElementById("districtArrow");
+const activeDistrictBadge = document.getElementById("activeDistrictBadge");
+
+if (districtToggleBtn && districtDropdownPanel) {
+    districtToggleBtn.addEventListener("click", () => {
+        const isOpen = districtDropdownPanel.classList.toggle("open");
+        districtToggleBtn.classList.toggle("open", isOpen);
+        if (districtArrow) districtArrow.innerText = isOpen ? "▴" : "▾";
+    });
+}
+
 document.querySelectorAll("#district-filter-bar button").forEach(btn => {
     btn.addEventListener("click", () => {
         const district = btn.getAttribute("data-dist");
         document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
+
+        if (districtDropdownPanel) districtDropdownPanel.classList.remove("open");
+        if (districtToggleBtn) districtToggleBtn.classList.remove("open");
+        if (districtArrow) districtArrow.innerText = "▾";
+        if (activeDistrictBadge) {
+            activeDistrictBadge.style.display = "inline-block";
+            activeDistrictBadge.innerText = `चयनित जिला: ${district}`;
+        }
 
         const matched = allPublishedNews.filter(n =>
             (n.location && n.location.includes(district)) ||
@@ -466,6 +488,7 @@ if (searchInput) {
 document.getElementById("reset-filter").addEventListener("click", (e) => {
     e.preventDefault();
     document.getElementById("filtered-section").style.display = "none";
+    if (activeDistrictBadge) activeDistrictBadge.style.display = "none";
     document.querySelectorAll("#category-nav a").forEach(a => a.classList.remove("active"));
     document.querySelectorAll("#district-filter-bar button").forEach(b => b.classList.remove("active"));
     document.querySelector('#category-nav a[data-cat="ALL"]').classList.add("active");
