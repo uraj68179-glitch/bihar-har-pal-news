@@ -396,7 +396,7 @@ a {
 }
 
 /* ==========================================
-   COMPACT BREAKING NEWS TICKER
+   SLIM BREAKING NEWS TICKER
 ========================================== */
 
 .breaking {
@@ -407,29 +407,29 @@ a {
 .breaking-content {
     display: flex;
     align-items: center;
-    height: 36px;
+    height: 30px;
     overflow: hidden;
 }
 
 .breaking-label {
     background: var(--primary-red);
     color: #ffffff;
-    padding: 0 11px;
+    padding: 0 9px;
     height: 100%;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.4px;
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     z-index: 2;
     flex-shrink: 0;
 }
 
 .pulse-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     background: #fff;
     border-radius: 50%;
     animation: pulse 1.2s infinite;
@@ -443,18 +443,18 @@ a {
 .breaking-marquee {
     flex: 1;
     overflow: hidden;
-    padding-left: 12px;
+    padding-left: 10px;
     position: relative;
 }
 
 .breaking-text {
     display: inline-block;
-    font-size: 13.5px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--text-main);
     white-space: nowrap;
     padding-left: 100%;
-    animation: tickerSlide 26s linear infinite;
+    animation: tickerSlide 22s linear infinite;
 }
 
 .breaking-marquee:hover .breaking-text {
@@ -466,42 +466,83 @@ a {
     100% { transform: translateX(-100%); }
 }
 
-/* District Bar */
+/* ==========================================
+   BIHAR 38 DISTRICTS COLLAPSIBLE BAR
+========================================== */
+
 .district-bar {
     background: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
-    padding: 8px 0;
+    padding: 7px 0;
+    position: relative;
 }
 
-.district-flex {
+.district-header-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    overflow-x: auto;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.district-label {
+.district-toggle-btn {
+    background: var(--bg-gray);
+    border: 1.5px solid var(--primary-red);
+    color: var(--text-main);
+    padding: 5px 14px;
+    border-radius: 20px;
     font-size: 13px;
     font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.district-toggle-btn:hover,
+.district-toggle-btn.open {
+    background: var(--primary-red);
+    color: #ffffff;
+}
+
+.active-dist-badge {
+    background: #fef2f2;
     color: var(--primary-red);
-    white-space: nowrap;
+    border: 1px solid #fecaca;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.district-dropdown-panel {
+    display: none;
+    margin-top: 10px;
+    padding: 12px;
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.district-dropdown-panel.open {
+    display: block;
 }
 
 .district-pills {
     display: flex;
+    flex-wrap: wrap;
     gap: 7px;
 }
 
 .district-pills button {
-    background: var(--bg-gray);
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
     color: var(--text-main);
-    padding: 4px 12px;
-    border-radius: 16px;
+    padding: 4px 11px;
+    border-radius: 15px;
     font-size: 12.5px;
     font-weight: 700;
     cursor: pointer;
-    white-space: nowrap;
     transition: 0.2s;
 }
 
