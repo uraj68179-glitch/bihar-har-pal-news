@@ -72,7 +72,7 @@
         </div>
     </nav>
 
-    <!-- Live Breaking News Ticker -->
+    <!-- Compact Live Breaking News Ticker -->
     <div class="breaking">
         <div class="container breaking-content">
             <div class="breaking-label">
@@ -116,17 +116,24 @@
             <div class="news-grid" id="filtered-grid"></div>
         </section>
 
-        <!-- Hero Lead + Latest Sidebar -->
+        <!-- Hero Lead Auto-Slider + Latest Sidebar -->
         <section class="featured" id="home-featured-section">
-            <!-- Main Lead Story -->
-            <article class="main-news" id="featured-main">
-                <div class="news-image">खबर लोड हो रही है...</div>
-                <div class="news-content">
-                    <span class="category">बिहार</span>
-                    <h2>ताज़ा खबरें लोड हो रही हैं...</h2>
-                    <p>कृपया प्रतीक्षा करें।</p>
+            <!-- Main Lead Story Slider -->
+            <div class="hero-slider-wrapper">
+                <div class="hero-slides-track" id="featured-slider-track">
+                    <article class="main-news hero-slide">
+                        <div class="news-image">खबर लोड हो रही है...</div>
+                        <div class="news-content">
+                            <span class="category">बिहार</span>
+                            <h2>ताज़ा खबरें लोड हो रही हैं...</h2>
+                            <p>कृपया प्रतीक्षा करें।</p>
+                        </div>
+                    </article>
                 </div>
-            </article>
+                <button class="slider-arrow prev" id="heroPrevBtn" aria-label="Previous">‹</button>
+                <button class="slider-arrow next" id="heroNextBtn" aria-label="Next">›</button>
+                <div class="slider-dots" id="heroSliderDots"></div>
+            </div>
 
             <!-- Latest News Sidebar -->
             <aside class="latest">
