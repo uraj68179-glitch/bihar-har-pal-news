@@ -72,34 +72,71 @@
         </div>
     </nav>
 
-    <!-- Compact Live Breaking News Ticker -->
+    <!-- Slim Breaking News Ticker -->
     <div class="breaking">
         <div class="container breaking-content">
             <div class="breaking-label">
-                <span class="pulse-dot"></span> BREAKING NEWS
+                <span class="pulse-dot"></span> BREAKING
             </div>
             <div class="breaking-marquee">
                 <div class="breaking-text" id="breaking-news-text">
-                    बिहार और देश-दुनिया की बड़ी खबरें लोड हो रही हैं...
+                    ताज़ा खबरें लोड हो रही हैं...
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bihar District Quick Filter Bar -->
+    <!-- Bihar 38 Districts Collapsible Bar -->
     <div class="district-bar">
-        <div class="container district-flex">
-            <span class="district-label">📍 अपना जिला चुनें:</span>
-            <div class="district-pills" id="district-filter-bar">
-                <button data-dist="मुजफ्फरपुर">मुजफ्फरपुर</button>
-                <button data-dist="साहेबगंज">साहेबगंज</button>
-                <button data-dist="पटना">पटना</button>
-                <button data-dist="दरभंगा">दरभंगा</button>
-                <button data-dist="गया">गया</button>
-                <button data-dist="भागलपुर">भागलपुर</button>
-                <button data-dist="पूर्णिया">पूर्णिया</button>
-                <button data-dist="सारण">सारण</button>
-                <button data-dist="चंपारण">चंपारण</button>
+        <div class="container">
+            <div class="district-header-row">
+                <button type="button" id="districtToggleBtn" class="district-toggle-btn">
+                    📍 अपना जिला चुनें (38 जिले) <span id="districtArrow">▾</span>
+                </button>
+                <span id="activeDistrictBadge" class="active-dist-badge" style="display:none;"></span>
+            </div>
+
+            <div class="district-dropdown-panel" id="districtDropdownPanel">
+                <div class="district-pills" id="district-filter-bar">
+                    <button data-dist="अररिया">अररिया</button>
+                    <button data-dist="अरवल">अरवल</button>
+                    <button data-dist="औरंगाबाद">औरंगाबाद</button>
+                    <button data-dist="बांका">बांका</button>
+                    <button data-dist="बेगूसराय">बेगूसराय</button>
+                    <button data-dist="भागलपुर">भागलपुर</button>
+                    <button data-dist="भोजपुर">भोजपुर</button>
+                    <button data-dist="बक्सर">बक्सर</button>
+                    <button data-dist="दरभंगा">दरभंगा</button>
+                    <button data-dist="पूर्वी चंपारण">पूर्वी चंपारण</button>
+                    <button data-dist="गया">गया</button>
+                    <button data-dist="गोपालगंज">गोपालगंज</button>
+                    <button data-dist="जमुई">जमुई</button>
+                    <button data-dist="जहानाबाद">जहानाबाद</button>
+                    <button data-dist="कैमूर">कैमूर</button>
+                    <button data-dist="कटिहार">कटिहार</button>
+                    <button data-dist="खगड़िया">खगड़िया</button>
+                    <button data-dist="किशनगंज">किशनगंज</button>
+                    <button data-dist="लखीसराय">लखीसराय</button>
+                    <button data-dist="मधेपुरा">मधेपुरा</button>
+                    <button data-dist="मधुबनी">मधुबनी</button>
+                    <button data-dist="मुंगेर">मुंगेर</button>
+                    <button data-dist="मुजफ्फरपुर">मुजफ्फरपुर</button>
+                    <button data-dist="नालंदा">नालंदा</button>
+                    <button data-dist="नवादा">नवादा</button>
+                    <button data-dist="पटना">पटना</button>
+                    <button data-dist="पूर्णिया">पूर्णिया</button>
+                    <button data-dist="रोहतास">रोहतास</button>
+                    <button data-dist="सहरसा">सहरसा</button>
+                    <button data-dist="समस्तीपुर">समस्तीपुर</button>
+                    <button data-dist="सारण">सारण</button>
+                    <button data-dist="शेखपुरा">शेखपुरा</button>
+                    <button data-dist="शिवहर">शिवहर</button>
+                    <button data-dist="सीतामढ़ी">सीतामढ़ी</button>
+                    <button data-dist="सिवान">सिवान</button>
+                    <button data-dist="सुपौल">सुपौल</button>
+                    <button data-dist="वैशाली">वैशाली</button>
+                    <button data-dist="पश्चिमी चंपारण">पश्चिमी चंपारण</button>
+                </div>
             </div>
         </div>
     </div>
