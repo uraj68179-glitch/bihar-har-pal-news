@@ -16,6 +16,8 @@ const db = getFirestore(app);
 let allPublishedNews = [];
 let currentOpenNews = null;
 let currentFontSize = 17.5;
+let heroSlideIndex = 0;
+let heroAutoTimer = null;
 
 // Live Hindi Date
 const liveDateEl = document.getElementById("live-date");
@@ -164,6 +166,81 @@ function createNewsCard(news) {
     return card;
 }
 
+// Top News Left-to-Right Auto Slider
+function initHeroSlider(slidesList) {
+    const track = document.getElementById("featured-slider-track");
+    const dotsContainer = document.getElementById("heroSliderDots");
+    const prevBtn = document.getElementById("heroPrevBtn");
+    const nextBtn = document.getElementById("heroNextBtn");
+    if (!track || slidesList.length === 0) return;
+
+    track.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    slidesList.forEach((news, idx) => {
+        const slide = document.createElement("article");
+        slide.className = "main-news hero-slide";
+        const imgHtml = news.imageUrl
+            ? `<img src="${news.imageUrl}" alt="${news.headline}">`
+            : `मुख्य खबर`;
+
+        slide.innerHTML = `
+            <div class="news-image">${imgHtml}</div>
+            <div class="news-content">
+                <span class="category">${news.category || "बिहार"}</span>
+                <h2>${news.headline}</h2>
+                <p>${news.shortDescription || news.fullNews.substring(0, 145) + "..."}</p>
+                <span class="date">📍 ${news.location || "बिहार"}  •  📅 ${news.date || ""}  •  👁️ ${news.views || 0} बार पढ़ा गया</span>
+            </div>
+        `;
+        slide.addEventListener("click", () => openNewsModal(news));
+        track.appendChild(slide);
+
+        const dot = document.createElement("button");
+        dot.className = "slider-dot" + (idx === 0 ? " active" : "");
+        dot.setAttribute("aria-label", `Slide ${idx + 1}`);
+        dot.addEventListener("click", (e) => {
+            e.stopPropagation();
+            goToSlide(idx);
+        });
+        dotsContainer.appendChild(dot);
+    });
+
+    function goToSlide(index) {
+        const total = slidesList.length;
+        heroSlideIndex = (index + total) % total;
+        track.style.transform = `translateX(-${heroSlideIndex * 100}%)`;
+        dotsContainer.querySelectorAll(".slider-dot").forEach((d, i) => {
+            d.classList.toggle("active", i === heroSlideIndex);
+        });
+    }
+
+    function startAutoSlide() {
+        clearInterval(heroAutoTimer);
+        if (slidesList.length > 1) {
+            heroAutoTimer = setInterval(() => goToSlide(heroSlideIndex + 1), 4000);
+        }
+    }
+
+    prevBtn.onclick = (e) => {
+        e.stopPropagation();
+        goToSlide(heroSlideIndex - 1);
+        startAutoSlide();
+    };
+
+    nextBtn.onclick = (e) => {
+        e.stopPropagation();
+        goToSlide(heroSlideIndex + 1);
+        startAutoSlide();
+    };
+
+    const wrapper = track.parentElement;
+    wrapper.addEventListener("mouseenter", () => clearInterval(heroAutoTimer));
+    wrapper.addEventListener("mouseleave", startAutoSlide);
+
+    startAutoSlide();
+}
+
 function renderTrendingSidebar() {
     const trendEl = document.getElementById("trending-news-list");
     if (!trendEl) return;
@@ -203,28 +280,19 @@ async function loadNews() {
             return;
         }
 
+        // Compact Breaking News Headlines
         const breakingList = allPublishedNews.filter(n => n.breakingNews);
-        const breakingText = breakingList.length > 0
-            ? breakingList.map(n => n.headline).join("   🔴   ")
-            : allPublishedNews[0].headline;
+        const sourceBreaking = breakingList.length > 0 ? breakingList : allPublishedNews.slice(0, 3);
+        const breakingText = sourceBreaking
+            .map(n => n.headline.length > 65 ? n.headline.substring(0, 62) + "..." : n.headline)
+            .join("   🔴   ");
         document.getElementById("breaking-news-text").innerText = breakingText;
 
-        const featuredNews = allPublishedNews.find(n => n.featuredNews) || allPublishedNews[0];
-        const featuredMain = document.getElementById("featured-main");
-        const featImgHtml = featuredNews.imageUrl
-            ? `<img src="${featuredNews.imageUrl}" alt="${featuredNews.headline}">`
-            : `मुख्य खबर`;
-
-        featuredMain.innerHTML = `
-            <div class="news-image">${featImgHtml}</div>
-            <div class="news-content">
-                <span class="category">${featuredNews.category || "बिहार"}</span>
-                <h2>${featuredNews.headline}</h2>
-                <p>${featuredNews.shortDescription || featuredNews.fullNews.substring(0, 150) + "..."}</p>
-                <span class="date">📍 ${featuredNews.location || "बिहार"}  •  📅 ${featuredNews.date || ""}  •  👁️ ${featuredNews.views || 0} बार पढ़ा गया</span>
-            </div>
-        `;
-        featuredMain.onclick = () => openNewsModal(featuredNews);
+        // Top 5 News Slider (Featured first, then latest)
+        const featuredPriority = allPublishedNews.filter(n => n.featuredNews);
+        const otherNews = allPublishedNews.filter(n => !n.featuredNews);
+        const topSlides = [...featuredPriority, ...otherNews].slice(0, 5);
+        initHeroSlider(topSlides);
 
         const latestListEl = document.getElementById("latest-news-list");
         latestListEl.innerHTML = "";
